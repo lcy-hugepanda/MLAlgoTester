@@ -1,0 +1,80 @@
+DDTools_MOG(%FRACREJ%)
+mog_dd(A, %FRACREJ%)
+
+DDTools_NNDD(%FRACREJ%)
+nndd(A, %FRACREJ%)
+
+DDTools_GaussDD(%FRACREJ%)
+gauss_dd(A, %FRACREJ%)
+
+DDTools_SVDD(%FRACREJ%)
+svdd(A, %FRACREJ%)
+
+DDTools_MPM(%FRACREJ%)
+mpm_dd(A, %FRACREJ%)
+
+DDTools_incSVDD(%FRACREJ%)
+incsvdd(A, %FRACREJ%)
+
+DDTools_lpDD(%FRACREJ%)
+lpdd(A, %FRACREJ%)
+
+DDTools_ParzenDD(%FRACREJ%)
+parzen_dd(A, %FRACREJ%)
+
+DDTools_StumpDD(%FRACREJ%,1)
+stump_dd(A, %FRACREJ%)
+
+DDTools_LOF(%FRACREJ%)
+lofdd(A,%FRACREJ%)
+
+DDTools_LOCI(%FRACREJ%)
+locidd(A,%FRACREJ%)
+
+MLAlgo_LOCI(%FRACREJ%)
+MLAlgo_LOCI(A, %FRACREJ%)
+
+MLAlgo_LOF(%FRACREJ%)
+MLAlgo_LOF(A, %FRACREJ%)
+
+MLAlgo_SVM(%FRACREJ%)
+MLAlgo_SVM(A,%FRACREJ%)
+
+DDTools_KLLDC(%FRACREJ%)
+klldc(A, %FRACREJ%)
+
+DDTools_PCLDC(%FRACREJ%)
+pcldc(A, %FRACREJ%)
+
+DDTools_LOGLC(%FRACREJ%)
+loglc(A, %FRACREJ%)
+
+DDTools_FISJERC(%FRACREJ%)
+fisherc(A, %FRACREJ%)
+
+DDTools_NMC(%FRACREJ%)
+nmc(A, %FRACREJ%)
+
+DDTools_NMSC(%FRACREJ%)
+nmsc(A, %FRACREJ%)
+
+DDTools_Rankboost(%FRACREJ%,%IterationTime%)
+rankboostc(A,%FRACREJ%,%IterationTime%)
+
+NoOutlier_Rankboost(%FRACREJ%,%IterationTime%,%OutlierGenMethod%)
+MLAlgo_RankboostEOCWithoutNeg(A,%FRACREJ%,%IterationTime%,%OutlierGenMethod%)
+
+Libsvm_OCSVM(%FRACREJ%)
+OCLT_AlgoLibsvmOCSVM(A, 'default', %FRACREJ%, A)
+
+Meta_Bagging(%SubAlgo%,%IterationTime%,%CombineRule%)
+RSCH_OCL_META_GeneralBagging(A,%IterationTime%,%SubAlgo%,%CombineRule%)
+
+Meta_RSM(%SubAlgo%,%IterationTime%,%CombineRule%)
+RSCH_OCL_META_GeneralRSM_subC(A,%IterationTime%,%SubAlgo%,%CombineRule%)
+
+Meta_Boosting(%SubAlgo%,%IterationTime%,%CombineRule%,%OutlierGenMethod%)
+RSCH_OCL_META_GeneralBoosting(A,%IterationTime%,%SubAlgo%,%CombineRule%,%OutlierGenMethod%)
+
+Meta_PHDEOC(%SubAlgo%,%IterationTime%,%CombineRule%)
+RSCH_OCL_META_PHDEOC(A,%IterationTime%,%SubAlgo%,%CombineRule%)

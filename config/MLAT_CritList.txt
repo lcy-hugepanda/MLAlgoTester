@@ -1,0 +1,23 @@
+DDTools_Precision
+ddtools_precision(A, W)
+
+DDTools_Recall
+ddtools_recall(A, W)
+
+DDTools_F1
+ddtools_f1(A, W)
+
+DDTools_AUC
+ddtools_auc(A, W)
+
+PRTools_Reject
+prtools_reject(A, W)
+
+DDTools_ROC
+ddtools_roc(A, W)
+
+PRTools_ERROR
+prtools_error(A, W)
+
+OC_MCC
+oc_mcc(A, W)
