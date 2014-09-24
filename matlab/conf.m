@@ -74,7 +74,7 @@ FRACREJ = 0.1;
 
 % Datasets to be evaluated
 if 1 == test_type
-    dataset_path = '../datasets/test_S/';
+    dataset_path = '../datasets/test_XS/';
 elseif 2 == test_type
     dataset_list = [1];  % 二维人工数据集选择
 end

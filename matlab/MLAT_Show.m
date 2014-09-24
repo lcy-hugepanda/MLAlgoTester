@@ -256,8 +256,8 @@ str_addition = cell(1, 1 + 2*num_algo);
 str_addition{1,1} = '=B2=MAX($B2:$I2)';
 
 str_show = [cell(1,1) str_algo; dataset_list' str_data; str_addition];
-xlswrite('result.xls',str_show);
-winopen('result.xls')
+xlswrite('..\results\result.xls',str_show);
+winopen('..\results\result.xls')
 
 end
 
