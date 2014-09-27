@@ -78,3 +78,6 @@ RSCH_OCL_META_GeneralBoosting(A,%IterationTime%,%SubAlgo%,%CombineRule%,%Outlier
 
 Meta_PHDEOC(%SubAlgo%,%IterationTime%,%CombineRule%)
 RSCH_OCL_META_PHDEOC(A,%IterationTime%,%SubAlgo%,%CombineRule%)
+
+OCCBoost(%FRACREJ%,%IterationTime%,%OutlierPrecision%)
+RSCH_OCL_ESM_OCCBoost(A,%FRACREJ%,%IterationTime%,%OutlierPrecision%)
