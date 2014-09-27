@@ -22,7 +22,7 @@ num_dataset = size(result,2);% 数据集个数
 [~,num_algo] = size(algo_list); % 算法个数
 
 %% 这里用数字选择采用哪种，以便于F5调试
-show_type = 201;
+show_type =201;
 % show_type说明以及各自的设定
 % 绘图类
 %---------------------------------------------------------------------------
@@ -32,7 +32,7 @@ dataset_idx = 1; % 这里设置数据集标签
 %---------------------------------------------------------------------------
 elseif 102 == show_type
 % 102 : 集成算法迭代图，固定某一个数据集，子图说明各集成算法的迭代性能波动情况
-dataset_idx = 2;
+dataset_idx = 1;
 iteration_time = 50;  % 注意要给定显示出来的迭代次数
 %---------------------------------------------------------------------------
 % 103 : 集成算法迭代图，固定某一个算法，子图说明各数据集上的迭代性能波动情况
@@ -42,12 +42,12 @@ iteration_time = 50;% 注意要给定显示出来的迭代次数
 %---------------------------------------------------------------------------
 % 104 : 数据集/算法初步测试图，固定一个算法，子图说明各数据集上测试情况【调试用】
 elseif 104 == show_type
-algo_idx = 2;
+algo_idx = 1;
 %---------------------------------------------------------------------------
 % 105 : 算法1vs1散点对比图，对比两个算法在多个数据集上的效果，子图说明各评价指标的情况
 elseif 105 == show_type
-algo_a_idx = 4;
-algo_b_idx = 5;
+algo_a_idx = 3;
+algo_b_idx = 1;
 % 106 : 各算法在各数据集上的ranking盒图，用于全面对比各个算法在某一个指标上的效果
 elseif 106 == show_type
 crit_idx = 1;
@@ -63,7 +63,7 @@ crit_idx = 1;
 % 二维数据可视化类
 % 301:固定一个算法，绘制其在各人工数据集上的决策面
 elseif 301 == show_type
-    algo_idx = 2;
+    algo_idx = 1;
 % 302:固定一个数据集，绘制各个算法在其上的决策面
 elseif 302  == show_type
     dataset_idx = 1;
@@ -81,10 +81,11 @@ end
 
 %==========================具体实现==============================================
 if 101 == show_type
+    [subp_m, subp_n, subp_pos] = MLAT_PlanSubplot(num_algo);
 % 以具体的某一个数据集为核心，每一个子图显示一种算法的性能波动
 for p = 1 : 1 : num_algo
-    subplot(2,3,p)
-    MLAT_Plot_Result( result, 1, dataset_idx, p )
+    subplot(subp_m, subp_n,p,'position',subp_pos(p,:))
+    MLAT_Plot_Result( result, 1, dataset_idx, p, crit_list );
     title(strrep(algo_list{p}(1:find(algo_list{p}=='(')-1),'_','\_'))
 end
 end
@@ -148,11 +149,12 @@ end
 end     
 
 if 104 == show_type
+    [subp_m, subp_n, subp_pos] = MLAT_PlanSubplot(num_dataset);
 % 以具体的某一个算法为核心，每一个子图显示每一个数据集的性能
 % 主要用于判断某一个算法或者某一个数据集的运作是否正常
 for d = 1 : 1 : num_dataset
-	subplot(2,3,d)
-    MLAT_Plot_Result( result, 1, d, algo_idx )
+	subplot(subp_m, subp_n,d,'position',subp_pos(d,:))
+    MLAT_Plot_Result( result, 1, d, algo_idx, crit_list )
     title(strrep(dataset_list{d},'_','\_'))
 end
 end

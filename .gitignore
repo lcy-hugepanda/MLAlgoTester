@@ -1,6 +1,5 @@
 #这里定义不同步的文件夹#
-/results
-/
+/results/
 /datasets/
 
 #这里定义不同步的文件类型

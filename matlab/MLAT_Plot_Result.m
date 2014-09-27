@@ -18,19 +18,19 @@ line_width = 1.5;
 if 1 == type  % 绘图type 1：性能波动曲线
     data = result{dataset};
     [m, n] = size(data);
-    i = 1;
-    for p = 1:m
-        for q = 1:n
-            y_precision(1,i) = data{p,q}{algo,1};
-            y_recall(1,i) = data{p,q}{algo,2};
-            y_F1(1,i) = data{p,q}{algo,3};
-            i = i+1;
-        end
-    end
     x = 1 : 1 : m*n;
-    set(0,'defaultfigurecolor','w');
-    plot(x,y_precision,':+b',x,y_recall,':*r',x,y_F1,':ok');
-    legend('precision','recall','F1');
+    y = zeros(m*n, length(crit_list));
+    for i = 1 : length(crit_list)
+        for p = 1:m
+            for q = 1:n
+                y((p-1)*n + q, i) = data{p,q}{algo,i};
+            end
+        end
+        set(0,'defaultfigurecolor','w');
+        plot(x,y(:,i),plot_style{i});
+    end
+     
+    legend(crit_list);
     grid on
 end
 
