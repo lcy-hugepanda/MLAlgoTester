@@ -9,6 +9,8 @@ function A  = MLAT_GenAritificialData(idx)
         A = DataArtificialGenForOCC('spiral',[200,200],[],40);
     elseif 5 == idx
         A = DataArtificialGenForOCC('two circle',[200,200]);
+    elseif 6 == idx
+        A = DataArtificialGenForOCC('multi density',[100,100]);
     end
 end
 
@@ -173,10 +175,10 @@ switch type
         % END 生成多个高斯分布
     case 'multi density'
         %% 生成多个不同密度分布的Target
-        part1 = LC_DataArtificialGenForOCC('sine',[200,200],[-6 2 6 2],20);
+        part1 = DataArtificialGenForOCC('sine',[200,200],[-6 2 6 2],20);
         part2 = oc_set(gendatb([120,120]),'2');
         %part2 = oc_set(gauss([150 30],[6 7; 5 5]),'1');
-        A = LC_DataCombineDatasets(part1, part2, 1);
+        A = OCLT_DataCombineDatasets(part1, part2);
         % END 生成多个不同密度分布的Target
     case 'multi gauss for cluster stability analysis'
         %% 生成多个高斯分布的Target，用于聚类稳定性分析
