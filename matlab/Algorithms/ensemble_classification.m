@@ -32,7 +32,7 @@ elseif mapping_task(argin,'training')
         str_training = [Algo_name,'(A)'];
         W{i}= eval(str_training);
     end
-
+    data.Idx = Idx;
     data.w = W;
     data.k = k;
     data.ensemble = Emsemble;

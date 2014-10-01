@@ -170,8 +170,8 @@ switch type
         part1 = oc_set(gauss([150 30],[-1 -1; 3 3]),'1');
         part2 = oc_set(gauss([150 30],[8 8; 5 5]),'1');
         part3 = oc_set(gauss([150 30],[-1 8; 4 4]),'1');
-        A = LC_CombineDatasets(part1, part2, 1);
-        A = LC_CombineDatasets(A, part3, 1);
+        A = DataArtificialGenForOCC(part1, part2, 1);
+        A = OCLT_DataCombineDatasets(A, part3, 1);
         % END 生成多个高斯分布
     case 'multi density'
         %% 生成多个不同密度分布的Target
