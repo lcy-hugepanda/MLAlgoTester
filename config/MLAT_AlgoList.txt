@@ -22,6 +22,9 @@ lpdd(A, %FRACREJ%)
 DDTools_ParzenDD(%FRACREJ%)
 parzen_dd(A, %FRACREJ%)
 
+DDTools_Incsvdd(%FRACREJ%)
+incsvdd(A, %FRACREJ%)
+
 DDTools_StumpDD(%FRACREJ%,1)
 stump_dd(A, %FRACREJ%)
 
