@@ -23,7 +23,10 @@ elseif mapping_task(argin,'training')
             Idx = zeros(length(a.data),1);
             for i = 1:k  
                 Idx(find(U(i,:) == maxU)) = i;
-            end            
+            end 
+        case 'dbscan'
+            [Idx,type]=dbscan(a.data,k,[]) ;
+            k = max(unique(Idx));
     end
     for i = 1:1:k
         cluster{i} = find(Idx==i);
