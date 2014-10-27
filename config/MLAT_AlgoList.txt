@@ -85,5 +85,5 @@ RSCH_OCL_META_PHDEOC(A,%SubAlgo%,%IterationTime%,%CombineRule%)
 OCCBoost(%FRACREJ%,%IterationTime%,%OutlierPrecision%)
 RSCH_OCL_ESM_OCCBoost(A,%FRACREJ%,%IterationTime%,%OutlierPrecision%)
 
-Meta_ClustEOCC(%ClusterNum%,%ClusterName%,%Classification%)
-RSCH_OCL_ESM_ClustFramework(A,%ClusterNum%,%ClusterName%,%Classification%)
+Meta_ClustEOCC(%ClusterNum%,%ClusterArgument%,%ClusterName%,%OCC_Name%,%CombineRule%)
+RSCH_OCL_ESM_ClustFramework(A,%ClusterNum%,%ClusterArgument%,%ClusterName%,%OCC_Name%,%CombineRule%)
