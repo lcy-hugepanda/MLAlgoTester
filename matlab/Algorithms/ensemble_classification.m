@@ -17,6 +17,16 @@ elseif mapping_task(argin,'training')
             Idx = feval(Clus_name,d,k);
         case 'kcentres'
             Idx = feval(Clus_name,d,k);
+        case 'fcm'
+            [center,U,obj_fcn] = fcm(a.data,k);
+            maxU = max(U);
+            Idx = zeros(length(a.data),1);
+            for i = 1:k  
+                Idx(find(U(i,:) == maxU)) = i;
+            end 
+        case 'dbscan'
+            [Idx,type]=dbscan(a.data,k,[]) ;
+            k = max(unique(Idx));
     end
     for i = 1:1:k
         cluster{i} = find(Idx==i);
