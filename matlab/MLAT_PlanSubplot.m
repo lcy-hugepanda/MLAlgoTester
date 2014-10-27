@@ -13,6 +13,9 @@ function [m,n,pos] = MLAT_PlanSubplot(num_p)
     elseif num_p < 13 % 子图数：9,10,11, 12  三行
         m = 3;
         n = ceil(num_p / 3);
+    elseif num_p == 24
+        m = 5;
+        n = 5;
     end
     
         pos = PlotCalculateSubplotPos(m, n);
