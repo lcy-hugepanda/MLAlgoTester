@@ -1,4 +1,4 @@
-function out = ensemble_classification(varargin)
+function out = RSCH_OCL_ESM_ClustFramework(varargin)
 argin = setdefaults(varargin,[],3,'kmeans','svdd',maxc);
 if mapping_task(argin,'definition')
 	out = define_mapping(argin,'untrained',['MLAlgo_Ensemble_' int2str(argin{2})]);
