@@ -1,6 +1,6 @@
 % 用于整理测试结果，表现方式是图或表格
 
-gridsize(150)
+%gridsize(150)
 
 %% 【可选】读取已经测试完毕的结果
 is_need_load = 0;
@@ -80,7 +80,7 @@ elseif 305 == show_type
     dataset_idx = 1;
 % 306:（E12专用）针对某一个数据集，可视化各个聚类簇的情况，以及各簇上基分类器的情况和MST的情况
 elseif 306 == show_type
-    dataset_idx = 4;
+    dataset_idx = 1;
 else
     return;
 end
@@ -385,6 +385,7 @@ end
 end
 
 if 306 == show_type
+    gridsize(40)
     [subp_m, subp_n, subp_pos] = MLAT_PlanSubplot(num_algo);
 % （基于聚类的EOCC专用）针对某一个数据集，可视化各个聚类簇的情况，以及各簇上基分类器的情况
 % 需注意，算法中需要存储各聚类簇的标号为Idx，基分类器集合为subW
