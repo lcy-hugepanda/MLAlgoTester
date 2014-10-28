@@ -22,7 +22,7 @@ num_dataset = size(result,2);% 数据集个数
 [~,num_algo] = size(algo_list); % 算法个数
 
 %% 这里用数字选择采用哪种，以便于F5调试
-show_type =201;
+show_type =305;
 % show_type说明以及各自的设定
 % 绘图类
 %---------------------------------------------------------------------------
@@ -66,7 +66,7 @@ elseif 301 == show_type
     algo_idx = 1;
 % 302:固定一个数据集，绘制各个算法在其上的决策面
 elseif 302  == show_type
-    dataset_idx = 1;
+    dataset_idx = 4;
 % 303:固定数据集，显示各种人工负类生成方法（请注意，与测试过程无关）
 elseif 303  == show_type
     dataset_idx = 3;
@@ -75,6 +75,9 @@ elseif 304 == show_type
     algo_idx = 1;
     dataset_idx = 1;
     iterationShow = 1 : 1 : 12;
+% 305:（基于聚类的EOCC专用）针对某一个数据集，可视化各个聚类簇的情况，以及各簇上基分类器的情况
+elseif 305 == show_type
+    dataset_idx = 2;
 else
     return;
 end
@@ -338,5 +341,42 @@ for i = 1 : 1 : length(iterationShow)
     set(gca,'XTick',[]);
     set(gca,'YTick',[]);
     title(sprintf('Iteration %d',i));
+end
+end
+
+if 305 == show_type
+    [subp_m, subp_n, subp_pos] = MLAT_PlanSubplot(num_algo);
+% （基于聚类的EOCC专用）针对某一个数据集，可视化各个聚类簇的情况，以及各簇上基分类器的情况
+% 需注意，算法中需要存储各聚类簇的标号为Idx，基分类器集合为subW
+for a = 1 : 1 : num_algo
+    subplot(subp_m, subp_n,a,'position',subp_pos(a,:));
+    A = trainingA{dataset_idx,1}{1};
+    A_target = target_class(A);
+    plot_w = result_w{dataset_idx,1}{1,a};
+    v = plot_w.data;
+    Idx = v.Idx;
+    subW = v.subW;
+    num_clust = length(unique(Idx));
+    % 绘制聚类簇的显示
+    style = {'r+','gx','b*'}; % 最多支持8个簇
+    scatterd(A,'w.')
+    V=axis;
+    for k = 1 : 1 : num_clust
+        thisClusterIdx = find(Idx == k);
+        thisClusterA = seldat(A_target, [],[], thisClusterIdx);
+        dataM = thisClusterA.data;
+        scatter(dataM(:,1),dataM(:,2),style{k});  
+        hold on
+        axis(V);
+        plotc(subW{k},'g--');
+        hold on
+    end
+    plotc(plot_w,'r')
+    axis(V);
+	xlabel('')
+    ylabel('')
+    set(gca,'XTick',[]);
+    set(gca,'YTick',[]);
+    title(algo_list_display{a});
 end
 end

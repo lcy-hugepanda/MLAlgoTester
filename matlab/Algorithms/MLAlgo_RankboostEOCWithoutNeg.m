@@ -23,13 +23,14 @@ if mapping_task(argin,'definition')
 elseif mapping_task(argin,'training')
     % unpack all arguments, the name of parameters could be modified.
     % but the prdataset here always has a name of 'a' / 'A'
-    [A,fracrej,T, genoutMethod] = deal(argin{:});
+    [A,fracrej,T, genoutMethod,genoutNumber] = deal(argin{:});
     
     % Prepare
         %[numInstances,numAttributes,numClasses] = getsize(A); 
     
     % 使用人工负类替代真实的负类，构成eval_A
-	genout_str = sprintf('%s(A, 4*length(getnlab(A)))',genoutMethod);
+    [num_instance,num_feature] = size(A);
+	genout_str = sprintf('%s(A, num_feature*%d*num_instance)',genoutMethod,genoutNumber);
     gened_outlier = eval(genout_str);
     gened_outlier = seldat(gened_outlier,'outlier');
     eval_A = gendatoc(target_class(A), gened_outlier);

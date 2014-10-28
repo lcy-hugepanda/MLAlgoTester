@@ -6,5 +6,7 @@
 *.mat
 *.xls
 
-#不同步的文件
+#这里定义不同步的文件
 /matlab/conf.m
+/matlab/conf_E09.m
+/matlab/conf_E12.m

@@ -64,8 +64,8 @@ nmsc(A, %FRACREJ%)
 DDTools_Rankboost(%FRACREJ%,%IterationTime%)
 rankboostc(A,%FRACREJ%,%IterationTime%)
 
-NoOutlier_Rankboost(%FRACREJ%,%IterationTime%,%OutlierGenMethod%)
-MLAlgo_RankboostEOCWithoutNeg(A,%FRACREJ%,%IterationTime%,%OutlierGenMethod%)
+NoOutlier_Rankboost(%FRACREJ%,%IterationTime%,%OutlierGenMethod%,%OutlierGenNumber%)
+MLAlgo_RankboostEOCWithoutNeg(A,%FRACREJ%,%IterationTime%,%OutlierGenMethod%,%OutlierGenNumber%)
 
 Libsvm_OCSVM(%FRACREJ%)
 OCLT_AlgoLibsvmOCSVM(A, 'default', %FRACREJ%, A)
@@ -85,5 +85,5 @@ RSCH_OCL_META_PHDEOC(A,%SubAlgo%,%IterationTime%,%CombineRule%)
 OCCBoost(%FRACREJ%,%IterationTime%,%OutlierPrecision%)
 RSCH_OCL_ESM_OCCBoost(A,%FRACREJ%,%IterationTime%,%OutlierPrecision%)
 
-Ensemble_Classification(%ClusterNum%,%ClusterName%,%Classification%)
-ensemble_classification(A,%ClusterNum%,%ClusterName%,%Classification%)
+Meta_ClustEOCC(%ClusterNum%,%ClusterArgument%,%ClusterName%,%OCC_Name%,%CombineRule%)
+RSCH_OCL_ESM_ClustFramework(A,%ClusterNum%,%ClusterArgument%,%ClusterName%,%OCC_Name%,%CombineRule%)

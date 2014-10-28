@@ -21,15 +21,20 @@
 %  Faculty of Electrical Engineering, Mathematics and Computer Science,         
 %  Delft University of Technology,            
 %  The Netherlands
-function [W,tree,A] = mymst_dd(a,thr,N)
 
-if nargin < 3 || isempty(N), N = 0; end
-if nargin < 2 || isempty(thr), thr = 0.1; end
-if nargin < 1 || isempty(a) 
-	W = prmapping(mfilename,{thr,N});
-	W = setname(W,'MST Data Description');
-	return
-end
+% 这是一个MST_CD的修改版本，直接接受tree和A（邻接矩阵）的输入
+% 与MST_CD的原始版本不同，这个tree和A并非来自一般距离计算，而是来自DBCV计算得到的MST
+% 因此，从MST向外扩张的程度需要修正
+function [W,tree,A] = RSCH_OCL_ESM_ClustDBCVMST_subMST(a,thr,tree,A)
+    N = 0;
+    
+% if nargin < 3 || isempty(N), N = 0; end
+% if nargin < 2 || isempty(thr), thr = 0.1; end
+% if nargin < 1 || isempty(a) 
+% 	W = prmapping(mfilename,{thr,N});
+% 	W = setname(W,'MST Data Description');
+% 	return
+% end
 
 if ~ismapping(thr) 
 
@@ -37,24 +42,10 @@ if ~ismapping(thr)
   
 	% Make sure a is a OC dataset:
 	if ~isocset(a), error('one-class dataset expected'); end
+	
 	a = target_class(a);
 	[m,k] = size(a);
-    %计算可达距离d_reach
-	dist = sqrt(sqeucldistm(+a,+a));
-    o = 1;
-    for j = 1:m
-       apts(o) =  ((sum((1./dist(j,1:j-1)) .^ k) + sum((1./dist(j,j+1:m)) .^ k)) / (m - 1)) ^(-1/k) ;
-       o = o + 1;
-    end
-    for i = 1:m
-          for j = 1:m
-              d(i,j) = max([apts(i) apts(j) dist(i,j)]);              
-          end
-          d(i,i) = 0;
-    end
-    %d = sqrt(sqeucldistm(+a,+a));
-	[tree,A] = mst(d); % compute minimum spanning tree 
-
+    dist = A;
 	if N > 0
 		[dummy,paths] = m_paths(A,N);
 		tree = [];
@@ -79,8 +70,8 @@ if ~ismapping(thr)
 	W.so = al;
 	W.norm = n;
 	W.lambda_thr = lambda_thr; 
+    W.dist = dist;
 	W.threshold = 'thr';
-    W.dist = d;
 	W = prmapping(mfilename,'trained',W,str2mat('target','outlier'),k,2);
 
 %======== set threshold ======================================================
@@ -133,6 +124,7 @@ else
 	m = size(W.so,1);
 	[mm,k] = size(a);
 	out = zeros(mm,1);
+    dist = W.dist;
 	
 %=========memory checking ==========================	
 	mem = 20000000;
@@ -149,7 +141,7 @@ ind = zeros(mm,1);
 	for i=1:loops
 		sep = [x(i) + (1*(i~=1)):x(i+1) + (1*(i~=loops))]';
 		mmm = size(sep,1);
-        dataset = [+a(sep,:); +W.a];
+		 dataset = [+a(sep,:); +W.a];
         dist = sqrt(sqeucldistm(dataset,dataset));
 		o = 1;
         dsize = length(dataset);
@@ -168,6 +160,7 @@ ind = zeros(mm,1);
               %d(i,i) = 0;
         end
 		[dnn nn_ind]  = min(d,[],2);
+		%[dnn nn_ind]  = min(sqrt(sqeucldistm(+a(sep,:),W.a)),[],2);
 		
 		zz = repmat(reshape(+a(sep,:),mmm,1,k),[1,m,1]);
 		alal = repmat(reshape(+W.so,1,m,k),[mmm,1,1]);
