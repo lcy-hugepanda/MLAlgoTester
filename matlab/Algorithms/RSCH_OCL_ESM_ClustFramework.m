@@ -17,7 +17,7 @@
 %       -- dbscan
 % OCCAlgo: 基单类分类器表达式，请使用直接调用的格式
 % combineRule: 基分类器的集成方法
-%       -- maxc 最大化决策边界集成
+%       -- mergec 最大化决策边界集成
 
 function out = RSCH_OCL_ESM_ClustFramework(varargin)
 argin = setdefaults(varargin,[],3,'kmeans','svdd',maxc);
@@ -33,30 +33,34 @@ elseif mapping_task(argin,'training')
     % 确定聚类个数
     if strcmp(numClust,'direct')
         ; % 直接使用参数k
+    elseif strcmp(numClust, 'entropy')
+        [k, Idx] = selectKbyEntropy(a, disM, nameClustAlgo,k);
     end
     
     % 调用聚类算法,聚类个数输入是k，其他参数全部设置默认值或替换到位
-    switch nameClustAlgo
-        case 'kmeans'
-            Idx = feval(nameClustAlgo,a,k);
-        case 'emclust'
-            Idx = feval(nameClustAlgo,a,[],k,[]);
-        case 'hclust'            
-            Idx = feval(nameClustAlgo,disM,'complete',k);
-        case 'modeseek'
-            Idx = feval(nameClustAlgo,disM,k);
-        case 'kcentres'
-            Idx = feval(nameClustAlgo,disM,k);
-        case 'fcm'
-            [center,U,obj_fcn] = fcm(a.data,k);
-            maxU = max(U);
-            Idx = zeros(length(a.data),1);
-            for i = 1:k  
-                Idx(find(U(i,:) == maxU)) = i;
-            end 
-        case 'dbscan'
-            [Idx,type]=dbscan(a.data,k,[]) ;
-            k = max(unique(Idx));
+    if strcmp(numClust, 'direct')
+        switch nameClustAlgo
+            case 'kmeans'
+                Idx = feval(nameClustAlgo,a,k);
+            case 'emclust'
+                Idx = feval(nameClustAlgo,a,[],k,[]);
+            case 'hclust'            
+                Idx = feval(nameClustAlgo,disM,'complete',k);
+            case 'modeseek'
+                Idx = feval(nameClustAlgo,disM,k);
+            case 'kcentres'
+                Idx = feval(nameClustAlgo,disM,k);
+            case 'fcm'
+                [center,U,obj_fcn] = fcm(a.data,k);
+                maxU = max(U);
+                Idx = zeros(length(a.data),1);
+                for i = 1:k  
+                    Idx(find(U(i,:) == maxU)) = i;
+                end 
+            case 'dbscan'
+                [Idx,type]=dbscan(a.data,k,[]) ;
+                k = max(unique(Idx));
+        end
     end
     
     
