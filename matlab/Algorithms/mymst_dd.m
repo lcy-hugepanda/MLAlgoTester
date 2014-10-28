@@ -70,6 +70,9 @@ if ~ismapping(thr)
 	nn = +[al - bl];
 	nn(nn==0) = 10e-10; % nn~=0 as we divide by nn  
 	normn = sqrt(sum(nn.*nn,2));%«Ûæ‡¿Î
+%     for i = 1:length(tree)
+%         normn(i,1) = 
+%     end
 	n = nn./repmat(normn,1,k);
 	
 	lambda_thr = (bl - al)./n;
