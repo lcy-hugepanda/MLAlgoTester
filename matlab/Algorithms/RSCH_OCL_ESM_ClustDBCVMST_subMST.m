@@ -60,7 +60,10 @@ if ~ismapping(thr)
 % compute norm	
 	nn = +[al - bl];
 	nn(nn==0) = 10e-10; % nn~=0 as we divide by nn  
-	normn = sqrt(sum(nn.*nn,2));%«Ûæ‡¿Î
+	%normn = sqrt(sum(nn.*nn,2));%«Ûæ‡¿Î
+    for i = 1:length(tree)
+        normn(i,1) = A(tree(i,1),tree(i,2));
+    end
 	n = nn./repmat(normn,1,k);
 	
 	lambda_thr = (bl - al)./n;
@@ -124,7 +127,6 @@ else
 	m = size(W.so,1);
 	[mm,k] = size(a);
 	out = zeros(mm,1);
-    dist = W.dist;
 	
 %=========memory checking ==========================	
 	mem = 20000000;

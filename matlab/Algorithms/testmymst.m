@@ -1,8 +1,8 @@
-a = gendatb([50 50]);
-a = oc_set(a,'1');
-w = mymst_dd(a);
-% a = MLAT_GenAritificialData(1);
-% w= RSCH_OCL_ESM_ClustDBCVMST(a,'kmeans',4,0.05);
+% a = gendatb([50 50]);
+% a = oc_set(a,'1');
+% w = mymst_dd(a);
+a = MLAT_GenAritificialData(1);
+w= RSCH_OCL_ESM_ClustDBCVMST(a,'kmeans',4,0.05);
 
 testc(a,w);
 scatterd(a);

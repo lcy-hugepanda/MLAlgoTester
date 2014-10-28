@@ -22,11 +22,8 @@ num_dataset = size(result,2);% 数据集个数
 [~,num_algo] = size(algo_list); % 算法个数
 
 %% 这里用数字选择采用哪种，以便于F5调试
-<<<<<<< HEAD
-show_type =305;
-=======
+
 show_type =306;
->>>>>>> b03d6e2a04da2eae19e4da935a2e27a8843ca3d7
 % show_type说明以及各自的设定
 % 绘图类
 %---------------------------------------------------------------------------
@@ -81,14 +78,11 @@ elseif 304 == show_type
     iterationShow = 1 : 1 : 12;
 % 305:（基于聚类的EOCC专用）针对某一个数据集，可视化各个聚类簇的情况，以及各簇上基分类器的情况
 elseif 305 == show_type
-<<<<<<< HEAD
-    dataset_idx = 2;
-=======
+
     dataset_idx = 1;
 % 306:（E12专用）针对某一个数据集，可视化各个聚类簇的情况，以及各簇上基分类器的情况和MST的情况
 elseif 306 == show_type
-    dataset_idx = 4;
->>>>>>> b03d6e2a04da2eae19e4da935a2e27a8843ca3d7
+    dataset_idx = 1;
 else
     return;
 end

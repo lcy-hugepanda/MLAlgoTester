@@ -69,11 +69,11 @@ if ~ismapping(thr)
 % compute norm	
 	nn = +[al - bl];
 	nn(nn==0) = 10e-10; % nn~=0 as we divide by nn  
-	normn = sqrt(sum(nn.*nn,2));%求距离
-%     for i = 1:length(tree)
-%         normn(i,1) = 
-%     end
-	n = nn./repmat(normn,1,k);
+% 	normn = sqrt(sum(nn.*nn,2));%求距离
+    for i = 1:length(tree)
+        normn(i,1) = A(tree(i,1),tree(i,2));
+    end
+	n = nn./repmat(normn,1,k);%生成树边两点坐标差，除以，距离
 	
 	lambda_thr = (bl - al)./n;
 	lambda_thr = +lambda_thr(:,1);
@@ -94,8 +94,7 @@ if ~ismapping(thr)
 		if ~isempty(tmp) % there are objects in the training set but not in the the tree
 			w  = prmap(a(tmp,:),W); % map ~support objects on segments	
 			dist_tmp = sort([zeros(m-size(tmp,1),1);w.data(:,2)]);
-			thr = dist_tmp(m*(1-thr),1);
-			
+			thr = dist_tmp(m*(1-thr),1);			
 			if (thr==0)
 				prwarning(1,'threshold = 0, percent of rejected objects is larger than percent of objects not in the tree');
 			end
@@ -111,9 +110,9 @@ if ~ismapping(thr)
    		end																					  
 		end
 	else
-		AA = triu(A);
+		AA = triu(A);%提取矩阵的上三角
 		dist_tmp = sort(AA(AA~=0));
-		nr = round(size(dist_tmp,1)*(1-thr));
+		nr = round(size(dist_tmp,1)*(1-thr));%找到边的长度
 		if (nr==0)
 			thr = 0;
 		else
