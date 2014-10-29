@@ -78,7 +78,7 @@ if ~ismapping(thr)
 	W = prmapping(mfilename,'trained',W,str2mat('target','outlier'),k,2);
 
 %======== set threshold ======================================================
-
+%ÇóÀ©ÕÅ¾àÀë£¬n*(1-thr)
 	if N > 0
 		tmp = (setdiff(1:m,unique(tree(:))))';
 		
