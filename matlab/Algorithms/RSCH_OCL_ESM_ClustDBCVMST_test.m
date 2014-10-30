@@ -1,7 +1,7 @@
 gridsize 50
 
 a = MLAT_GenAritificialData(6);
-w= RSCH_OCL_ESM_ClustDBCVMST(a,'kmeans',2,0.05);
+w= RSCH_OCL_SIGL_DBMST(a,'dbscan',2,0.05);
 
 testc(a,w);
 scatterd(a);

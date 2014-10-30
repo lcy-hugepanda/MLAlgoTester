@@ -8,72 +8,68 @@
 %   k: 聚类算法的参数
 %   frej: 拒绝率
 function out = RSCH_OCL_SIGL_DBMST(varargin)
-argin = setdefaults(varargin,[],'kmeans',6,0.1);
+argin = setdefaults(varargin,[],0.1);
 
 if mapping_task(argin,'definition')
 	out = define_mapping(argin,'untrained',['RSCH_DBCVMST' int2str(argin{2})]);
 elseif mapping_task(argin,'training')
-    [A ,nameClustAlgo,k,frej] = deal(argin{:});
+    [A ,frej] = deal(argin{:});
     % 单独提取正类样本用于训练
     A_target = target_class(A);
+    num_target = size(A_target,1);
     
     % 聚类分析
-    dbcv = zeros(1,k);
-    msts = cell(1,k);
-    dbcv_best = -Inf;
-    best_k = 0;
-    for i = 2 : 1 : k
-        % 调用聚类算法（先只使用kmeans测试）
-        switch nameClustAlgo
-            case 'kmeans'
-                Idx = feval(nameClustAlgo,A_target,i);
-                num_clust = length(unique(Idx));
-            case 'emclust'
-                Idx = feval(nameClustAlgo,a,[],k,[]);
-            case 'hclust'            
-                Idx = feval(nameClustAlgo,disM,'complete',k);
-            case 'modeseek'
-                Idx = feval(nameClustAlgo,disM,k);
-            case 'kcentres'
-                Idx = feval(nameClustAlgo,disM,k);
-            case 'fcm'
-                [center,U,obj_fcn] = fcm(a.data,k);
-                maxU = max(U);
-                Idx = zeros(length(a.data),1);
-                for i = 1:k  
-                    Idx(find(U(i,:) == maxU)) = i;
-                end 
-            case 'dbscan'
-                [Idx,type]=dbscan(+A_target,i,[]) ;
-                num_clust = length(unique(Idx))-1; % -1 是outlier
-        end
-        
-        if 1 == length(unique(Idx))
-            disp 'k= 1'
-            continue;
-        end
-        
-        [dbcv(i),trees{i},adjM{i}] = MLAT_DBCV(A_target,Idx);  
-        fprintf('k=%d时，DBCV评价：%.2f\n',i,dbcv(i));
-        if dbcv(i) > dbcv_best
-            dbcv_best = dbcv(i);
-            best_k = num_clust;
-            best_i = i;
-            best_Idx = Idx;
-        end
+%     switch nameClustAlgo
+%         case 'dbscan'
+%                 [Idx,type]=dbscan(+A_target,k,[]) ;
+%                 num_clust = length(unique(Idx))-1; % -1 是outlier
+%         case 'kmeans'
+%                 Idx = kmeans(A_target,k);
+%                 num_clust = length(unique(Idx));
+%     end
+            
+    Idx = ones(size(A_target,1),1);
+    [~,trees,adjM] = MLAT_DBCV(A_target,Idx);
+    
+    % 删除太长的边，比例以正类拒绝率frej决定 (当前，仅从adjM中删除)
+    num_delete = fix(num_target * frej*2);
+    pruned_adjM = adjM{1};
+    while num_delete > 0
+        [temp, del_x] = max(pruned_adjM);
+        [temp, del_y] = max(temp);
+        pruned_adjM(del_x(del_y),del_y) = 0;
+        %fprintf('prun: %d %d\n',del_x(del_y),del_y);
+        num_delete = num_delete - 1;
     end
     
-    % 对每一个聚类簇的MST直接构建MST单类分类模型（这部分需要细化）
-    subW = cell(1,best_k);
-    for i = 1:1:best_k
-        subW{i}= RSCH_OCL_ESM_ClustDBCVMST_subMST(A_target,frej,trees{best_i}{i},adjM{best_i}{i});
+    % 从树中分析得到core point
+    % 同时以core point为核心构建每一个core set
+    point_weight = zeros(1, num_target);
+    idx_core = [];
+    core_set = cell(0);
+    for i = 1 : 1 : num_target  % 对于每一个点
+        point_set = find(pruned_adjM(i,:)>0); % 获取与之相连的点集
+        point_weight(i) = length(point_set);
+        if point_weight(i) > 2   % 与之相连的点超过1个，就是core点
+            idx_core = [idx_core; i];
+            core_set = [core_set; point_set];   % 与core点相连的就是core集
+        end
+    end
+   
+    % 对每一个core集构建单类分类模型（这部分需要细化）
+    subW = cell(1,length(core_set));
+    for i = 1:1:length(core_set)
+        A_target_thisCore = seldat(A_target,[],[],core_set{i});
+        subW{i}= gauss_dd(A_target_thisCore,frej);
     end
     
     % 构建trained的prmapping
-    data.Idx = best_Idx;
+    data.Idx = Idx;
+    data.Idx_core = idx_core;
     data.subW = subW;
-    data.k = best_k;
-    data.mst = trees{best_i};
+    data.k = length(core_set);
+    data.mst = trees;
+    data.adjM = pruned_adjM;
     out = trained_classifier(A_target, data);
     
 % 测试部分
