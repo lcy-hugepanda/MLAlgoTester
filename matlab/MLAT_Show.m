@@ -410,14 +410,14 @@ for a = 1 : 1 : num_algo
         thisClusterIdx = find(Idx == k);
         thisClusterA = seldat(A_target, [],[], thisClusterIdx);
         dataM = thisClusterA.data;
-        scatter(dataM(:,1),dataM(:,2),style_style{k});  
+        scatter(dataM(:,1),dataM(:,2),style_style{mod(k,4)+1});  
         hold on
         axis(V);
         plotc(subW{k},'g--');
         hold on
         for i = 1 : 1 : size(mst{k},1)
             points = dataM(mst{k}(i,:),:);
-            line(points(:,1),points(:,2),'Color',line_style{k});
+            line(points(:,1),points(:,2),'Color',line_style{mod(k,4)+1});
         end
     end
     plotc(plot_w,'r')

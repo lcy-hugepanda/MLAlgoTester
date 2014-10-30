@@ -1,10 +1,13 @@
-% E12论文使用的新方法
+% 一种实验方法
+% 首先通过类似于DBCV的方式进行密度分析并得到各个聚类簇的最小生成树
+% 之后对每一个MST进行分解并使用gauss_dd描述
+% 最后使用mergec合并
 % 参数
 %   A: 训练数据
 %   nameClustAlgo: 聚类算法名
-%   k: 聚类中心个数上限
+%   k: 聚类算法的参数
 %   frej: 拒绝率
-function out = RSCH_OCL_ESM_ClustDBCVMST(varargin)
+function out = RSCH_OCL_SIGL_DBMST(varargin)
 argin = setdefaults(varargin,[],'kmeans',6,0.1);
 
 if mapping_task(argin,'definition')
@@ -45,6 +48,11 @@ elseif mapping_task(argin,'training')
                 num_clust = length(unique(Idx))-1; % -1 是outlier
         end
         
+        if 1 == length(unique(Idx))
+            disp 'k= 1'
+            continue;
+        end
+        
         [dbcv(i),trees{i},adjM{i}] = MLAT_DBCV(A_target,Idx);  
         fprintf('k=%d时，DBCV评价：%.2f\n',i,dbcv(i));
         if dbcv(i) > dbcv_best
@@ -55,11 +63,10 @@ elseif mapping_task(argin,'training')
         end
     end
     
-    % 对每一个聚类簇的MST直接构建MST单类分类模型
+    % 对每一个聚类簇的MST直接构建MST单类分类模型（这部分需要细化）
     subW = cell(1,best_k);
     for i = 1:1:best_k
-        A_target_thisClust = seldat(A_target,[],[],find(Idx==i));
-        subW{i}= RSCH_OCL_ESM_ClustDBCVMST_subMST(A_target_thisClust,frej,trees{best_i}{i},adjM{best_i}{i});
+        subW{i}= RSCH_OCL_ESM_ClustDBCVMST_subMST(A_target,frej,trees{best_i}{i},adjM{best_i}{i});
     end
     
     % 构建trained的prmapping
