@@ -16,7 +16,8 @@ if 1 == func
 %  Data1, 0.9, 0.8
 %  Data2, 0.8, 0.7
 % 由于MATLAB的boxplot与PRTools冲突，请先clear classes
-src_path = '..\\results\\E09_AUC_compare.csv';
+clear classes
+src_path = '..\\results\\E09_AUC_compare_v2.csv';
 fin=fopen(src_path,'r');
 algo_name = fgetl(fin);
 fclose(fin);
@@ -69,13 +70,12 @@ ylabel('Ranks of algorithms','fontname','TimesNewRoman','fontsize',12);
 elseif 2 == func
 %% 使用多个csv表格（每一个算法对应一个）可视化表示某一个参数对算法性能的影响（每一个数据集一个子图）
 src_path = {...
-    '..\\results\\E09_Outlier_compare_OCCBoost1.csv',...
-    '..\\results\\E09_Outlier_compare_OCCBoost2.csv',...
+    '..\\results\\E09_Outlier_compare_OCCBoost.csv',...
     '..\\results\\E09_Outlier_compare_Unif.csv',...
     '..\\results\\E09_Outlier_compare_Block.csv'
 };
 num_algo = length(src_path);
-algo_name = {'OCCBoost1','OCCBoost2','Unif','Block'};
+algo_name = {'OCCBoost','Unif','Block'};
 data_name = {...
     'Biomed (carrier)','Biomed (normal)','Breast (benign)','Breast (malignant)',...
     'Diabetes (absent)','Diabetes (present)','Glass (Float)','Glass (NonFloat)',...
@@ -91,7 +91,7 @@ for a = 1 : 1 : length(src_path)
 end
 num_dataset = 24;
 x = 1: 1 : length(para_tick);
-style = {'rx-','m+-','b.-','ko-'};
+style = {'ro-','m+-','bx-'};
 h = cell(1,num_algo);
 for d =1 : 1 : 24
 %    [subp_m, subp_n, subp_pos] = MLAT_PlanSubplot(num_dataset);
@@ -107,7 +107,7 @@ for d =1 : 1 : 24
     end
     title(data_name{d},'fontname','TimesNewRoman','fontsize',12)
 end
-h_l = legend('OCCBoost1','OCCBoost2','Unif','Gauss',...
+h_l = legend('OCCBoost','Unif','Gauss',...
     'Location','EastOutside');
 set(h_l,'fontname','TimesNewRoman','fontsize',12);
 

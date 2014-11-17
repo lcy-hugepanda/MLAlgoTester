@@ -1,8 +1,14 @@
+DDTools_MSTCD(%FRACREJ%)
+mst_dd(A,%FRACREJ%)
+
 DDTools_MOG(%FRACREJ%)
 mog_dd(A, %FRACREJ%)
 
 DDTools_NNDD(%FRACREJ%)
 nndd(A, %FRACREJ%)
+
+DDTools_KNNDD(%FRACREJ%)
+knndd(A, %FRACREJ%)
 
 DDTools_GaussDD(%FRACREJ%)
 gauss_dd(A, %FRACREJ%)
