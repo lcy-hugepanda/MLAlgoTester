@@ -108,7 +108,7 @@ elseif mapping_task(argin,'execution')
             apts(i) = (numerator/length(mapping.mst.fdata{Idx(i)})) ^(-1/a.featsize);
             %apts为测试集中每个点的apt值。mapping.mst.apts为训练集中点的apt值。
             for j = 1:length(mapping.mst.fdata{Idx(i)})
-                d_reach{i}(j) = max([apts(i) mapping.mst.apts{Idx(i)}(j) dist(j)])
+                d_reach{i}(j) = max([apts(i) mapping.mst.apts{Idx(i)}(j) dist(j)]);
             end
         end
         %d_reach为测试集中点到该聚类簇点的可达距离。

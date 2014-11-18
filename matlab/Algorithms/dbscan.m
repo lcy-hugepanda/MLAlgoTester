@@ -9,7 +9,7 @@ x=zscore(x);
 if nargin<3||isempty(Eps) 
     [Eps]=epsilon(x,k); 
 end  
-x=[(1:m)',x]; 
+x=[(1:m)',x];
 [m,n]=size(x); 
 type=zeros(1,m); 
 no=1; 

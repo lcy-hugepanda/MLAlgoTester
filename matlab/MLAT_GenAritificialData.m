@@ -1,3 +1,4 @@
+% 人工数据集的生成函数，默认生成单类数据集，红色的点是target
 function A  = MLAT_GenAritificialData(idx)
     if 1 == idx
         A = DataArtificialGenForOCC('banana',[200,200]);
@@ -5,12 +6,16 @@ function A  = MLAT_GenAritificialData(idx)
         A = DataArtificialGenForOCC('rectangle',[200,200],[2 2 1 1],20);
     elseif 3 == idx
         A = DataArtificialGenForOCC('sine',[150,50],[1 10 2 1],25);
-    elseif 4 == idx
-        A = DataArtificialGenForOCC('spiral',[200,200],[],40);
+    elseif 4 == idx % 双螺旋数据
+        A = DataArtificialGenForOCC('spiral',[300,300],[],40);
     elseif 5 == idx
         A = DataArtificialGenForOCC('two circle',[200,200]);
     elseif 6 == idx
         A = DataArtificialGenForOCC('multi density',[100,100]);
+    elseif 7 == idx  % 四个Gauss分布，用于A03论文
+        A = DataArtificialGenForOCC('multi gauss for cluster stability analysis',[100,100]);
+    elseif 8 == idx % 多密度分布，使用两个散布程度不一样的高斯分布说明情况
+        A = DataArtificialGenForOCC('four bananas for multi density',[100,100]);
     end
 end
 
@@ -165,13 +170,25 @@ switch type
         A = prdataset([dataTarget;dataOutlier],[labelTarget;labelOutlier]);
         A = oc_set(A,1);
         % END 生成双螺旋分布
-	case 'multi gauss'
-        %% 生成多个高斯分布的Target
-        part1 = oc_set(gauss([150 30],[-1 -1; 3 3]),'1');
-        part2 = oc_set(gauss([150 30],[8 8; 5 5]),'1');
-        part3 = oc_set(gauss([150 30],[-1 8; 4 4]),'1');
-        A = DataArtificialGenForOCC(part1, part2, 1);
-        A = OCLT_DataCombineDatasets(A, part3, 1);
+	case 'four bananas for multi density'
+        %% 生成四个高斯分布的banana分布target，密度不同
+        N = [250 200 250 200];
+        r = [10 45 10 45];s = [0.5 2 0.5 2];
+        domain = 0.125*pi + rand(1,N(1))*1.25*pi; % 下方，内圈
+        dataM_1   = [r(1)*sin(domain') r(1)*cos(domain')] + randn(N(1),2)*s(1) + ...
+            ones(N(1),1)*[0.8*r(3)  -1*r(3)];
+        domain = 0.3*pi + rand(1,N(2))*0.8*pi;     % 下方，外圈
+        dataM_2   = [r(2)*sin(domain') r(2)*cos(domain')] + randn(N(2),2)*s(2);    
+        domain = 0.375*pi - rand(1,N(3))*1.25*pi;   % 上方，内圈
+        dataM_3   = [r(3)*sin(domain') r(3)*cos(domain')] + randn(N(3),2)*s(3) + ...
+            ones(N(3),1)*[-2*r(3)  -0.5*r(3)];
+        domain = 0.1*pi - rand(1,N(4))*0.9*pi;   % 上方，外圈
+        dataM_4   = [r(4)*sin(domain') r(4)*cos(domain')] + randn(N(4),2)*s(4) + ...
+            ones(N(4),1)*[-0.35*r(4) -0.35*r(4)];
+        dataM_outlier = unifrnd(-65,45,fix(sum(N)/3),2);
+          
+        A = gendatoc([dataM_1 ; dataM_2; dataM_3; dataM_4], dataM_outlier);
+        %A = OCLT_DataCombineDatasets(A, part3);
         % END 生成多个高斯分布
     case 'multi density'
         %% 生成多个不同密度分布的Target
@@ -186,8 +203,8 @@ switch type
         part2 = oc_set(gauss([100 30],[5 5; 5 5]),'1');
         part3 = oc_set(gauss([100 30],[0 5; 0 5]),'1');
         part4 = oc_set(gauss([100 30],[5 0; 5 0]),'1');
-        A = LC_DataCombineDatasets(part1, part2, 1);
-        A = LC_DataCombineDatasets(A, part3, 1);
+        A = OCLT_DataCombineDatasets(part1, part2);
+        A = OCLT_DataCombineDatasets(A, part3);
         A = gendatoc(A);
         A = gendatoc(A, part4);       
         % END 生成多个高斯分布，用于聚类稳定性分析

@@ -1,8 +1,14 @@
+DDTools_MSTCD(%FRACREJ%)
+mst_dd(A,%FRACREJ%)
+
 DDTools_MOG(%FRACREJ%)
 mog_dd(A, %FRACREJ%)
 
 DDTools_NNDD(%FRACREJ%)
 nndd(A, %FRACREJ%)
+
+DDTools_KNNDD(%FRACREJ%)
+knndd(A, %FRACREJ%)
 
 DDTools_GaussDD(%FRACREJ%)
 gauss_dd(A, %FRACREJ%)
@@ -90,3 +96,6 @@ RSCH_OCL_ESM_ClustFramework(A,%ClusterNum%,%ClusterArgument%,%ClusterName%,%OCC_
 
 E12_DBCV_MST(%ClusterName%,%ClusterNum%,%FRACREJ%)
 RSCH_OCL_ESM_ClustDBCVMST(A,%ClusterName%,%ClusterNum%,%FRACREJ%)
+
+DB_MST_GAUSS(%FRACREJ%)
+RSCH_OCL_SIGL_DBMST(A,0.1)

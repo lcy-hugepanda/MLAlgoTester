@@ -195,3 +195,4 @@ ind = zeros(mm,1);
 	end			
 end		
 return;
+votec
