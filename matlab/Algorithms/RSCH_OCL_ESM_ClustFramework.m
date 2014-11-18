@@ -27,6 +27,7 @@ if mapping_task(argin,'definition')
 elseif mapping_task(argin,'training')
     [a ,numClust,k ,nameClustAlgo,OCCAlgo,combineRule] = deal(argin{:});
     % 单独提取正类样本用于训练
+    a_origin = a;
     a = target_class(a);
     % 计算正类样本的距离矩阵（聚类算法需要）
     disM = sqrt(distm(a));
@@ -92,11 +93,12 @@ elseif mapping_task(argin,'training')
     data.OCCAlgo = OCCAlgo;
     data.mst = mstdata;
     data.combineRule = combineRule;
-    out = trained_classifier(a, data);
+    out = trained_classifier(a_origin, data);
     
 % 测试部分
 elseif mapping_task(argin,'execution')
     [a,v] = deal(argin{1:2}); 
+    a = prdataset(a);
 	mapping = getdata(v);
     
     if strcmp(mapping.OCCAlgo,'mst')
@@ -114,6 +116,21 @@ elseif mapping_task(argin,'execution')
             end
         end
         %d_reach为测试集中点到该聚类簇点的可达距离。
+        
+        % 设定每一个聚类簇的判定阈值
+        thr = zeros(1,mapping.k);
+        for i = 1 : 1 : mapping.k
+            mst_path = mapping.mst.path{i};
+            thr(i) = max(max(mst_path)) * (1 - 0.1);
+        end
+        
+        % 按照阈值判定测试点的归属
+        result = zeros(a.objsize, 2);
+        for i = 1 : 1 : a.objsize
+            result(i,1) = min(d_reach{i}) - thr(Idx(i));
+        end
+        
+        out = setdat(a,result,v);
     else
         w = mapping.subW;
         combineRule = mapping.combineRule;

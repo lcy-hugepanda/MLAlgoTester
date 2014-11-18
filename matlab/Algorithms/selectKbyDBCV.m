@@ -3,6 +3,7 @@ for i = 2:k
      switch nameClustAlgo
         case 'kmeans'
             Idx{i} = feval(nameClustAlgo,a,i);
+            
         case 'emclust'
             Idx{i} = feval(nameClustAlgo,a,[],i,[]);
         case 'hclust'            
@@ -25,8 +26,9 @@ for i = 2:k
      [dbcv(i),ftree{i},A{i},data{i},apts{i},dmreach{i}] = MLAT_DBCV(a,Idx{i});
 end
     [dbcv,i] = max(dbcv(2:end));
+    
     for j = 1:i
-    centers(j,:) = a.data(center{i}(j),:);
+        centers(j,:) = a.data(center{i}(j),:);
     end
     Index = Idx{i};
     k = i;
