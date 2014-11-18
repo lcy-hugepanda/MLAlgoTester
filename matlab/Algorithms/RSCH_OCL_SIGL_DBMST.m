@@ -17,9 +17,9 @@ elseif mapping_task(argin,'training')
     % 这里有一些微调选项
     knn_para = 1; % 越大的话，参与KNN的点越少，取1的时候和所有点取KNN
     is_delete_edge = true; % 是否根据DCT树的长度分布删除过于长的边
-    delete_para = 2.8; % 越大的话删除的边越少，默认取5
-    is_merge_core = false; % 是否将过于小的core集合并到大的core集中
-    para_gauss = 0.03;
+    delete_para = 5; % 越大的话删除的边越少，默认取5
+    is_merge_core = true; % 是否将过于小的core集合并到大的core集中
+    para_gauss = 0.1;
     
     % 单独提取正类样本用于训练
     A_target = target_class(A);

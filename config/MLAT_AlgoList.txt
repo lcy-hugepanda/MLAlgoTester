@@ -97,5 +97,5 @@ RSCH_OCL_ESM_ClustFramework(A,%ClusterNum%,%ClusterArgument%,%ClusterName%,%OCC_
 E12_DBCV_MST(%ClusterName%,%ClusterNum%,%FRACREJ%)
 RSCH_OCL_ESM_ClustDBCVMST(A,%ClusterName%,%ClusterNum%,%FRACREJ%)
 
-DB_MST_GAUSS(%FRACREJ%)
+DDC_EOC_GAUSS(%FRACREJ%)
 RSCH_OCL_SIGL_DBMST(A,0.1)

@@ -172,16 +172,16 @@ switch type
         % END 生成双螺旋分布
 	case 'four bananas for multi density'
         %% 生成四个高斯分布的banana分布target，密度不同
-        N = [250 200 250 200];
+        N = [300 200 300 200];
         r = [10 45 10 45];s = [0.5 2 0.5 2];
-        domain = 0.125*pi + rand(1,N(1))*1.25*pi; % 下方，内圈
+        domain = 0.025*pi + rand(1,N(1))*1.25*pi; % 下方，内圈
         dataM_1   = [r(1)*sin(domain') r(1)*cos(domain')] + randn(N(1),2)*s(1) + ...
             ones(N(1),1)*[0.8*r(3)  -1*r(3)];
         domain = 0.3*pi + rand(1,N(2))*0.8*pi;     % 下方，外圈
         dataM_2   = [r(2)*sin(domain') r(2)*cos(domain')] + randn(N(2),2)*s(2);    
-        domain = 0.375*pi - rand(1,N(3))*1.25*pi;   % 上方，内圈
+        domain = 0.2*pi - rand(1,N(3))*1.1*pi;   % 上方，内圈
         dataM_3   = [r(3)*sin(domain') r(3)*cos(domain')] + randn(N(3),2)*s(3) + ...
-            ones(N(3),1)*[-2*r(3)  -0.5*r(3)];
+            ones(N(3),1)*[-2.2*r(3)  -0.5*r(3)];
         domain = 0.1*pi - rand(1,N(4))*0.9*pi;   % 上方，外圈
         dataM_4   = [r(4)*sin(domain') r(4)*cos(domain')] + randn(N(4),2)*s(4) + ...
             ones(N(4),1)*[-0.35*r(4) -0.35*r(4)];
