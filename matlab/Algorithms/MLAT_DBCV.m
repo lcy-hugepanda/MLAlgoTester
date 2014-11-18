@@ -1,5 +1,5 @@
 %index 是一个标签数组，存储聚类标签。a为prdataset类型数据集。
-function [DBCV,tree,A,data,apts] = MLAT_DBCV(a,index)
+function [DBCV,tree,A,data,apts,d_mreach] = MLAT_DBCV(a,index)
   [lab,IA,IC] = unique(index);
   d = a.featsize;
   for i = 1:1:length(lab)

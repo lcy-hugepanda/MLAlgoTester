@@ -1,4 +1,4 @@
-function [centers, Index,k,tree,path,fdata,fapts] = selectKbyDBCV(a, disM, nameClustAlgo,k)
+function [centers, Index,k,tree,path,fdata,fapts,freach] = selectKbyDBCV(a, disM, nameClustAlgo,k)
 for i = 2:k
      switch nameClustAlgo
         case 'kmeans'
@@ -22,7 +22,7 @@ for i = 2:k
             [Idx{i},type]=dbscan(a.data,i,[]) ;
             i = max(unique(Idx{i}));
      end
-     [dbcv(i),ftree{i},A{i},data{i},apts{i}] = MLAT_DBCV(a,Idx{i});
+     [dbcv(i),ftree{i},A{i},data{i},apts{i},dmreach{i}] = MLAT_DBCV(a,Idx{i});
 end
     [dbcv,i] = max(dbcv(2:end));
     for j = 1:i
@@ -34,4 +34,5 @@ end
     path = A{i};
     fdata = data{i};
     fapts = apts{i};
+    freach = dmreach{i};
 end

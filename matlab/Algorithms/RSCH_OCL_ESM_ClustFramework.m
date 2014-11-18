@@ -37,7 +37,7 @@ elseif mapping_task(argin,'training')
     elseif strcmp(numClust, 'entropy')
         [k,Idx] = selectKbyEntropy(a, disM, 'kcentres',k);
     elseif strcmp(numClust,'DBCV')
-        [centers, Idx,k,tree,path,fdata,apts] = selectKbyDBCV(a, disM, 'kcentres',k);
+        [centers, Idx,k,tree,path,fdata,apts,dmreach] = selectKbyDBCV(a, disM, 'kcentres',k);
     end
     
     % 调用聚类算法,聚类个数输入是k，其他参数全部设置默认值或替换到位
@@ -72,6 +72,8 @@ elseif mapping_task(argin,'training')
         mstdata.path = path;
         mstdata.fdata = fdata; 
         mstdata.apts = apts;
+        mstdata.dmreach = dmreach; 
+        mstdata.Idx = Idx;
     else
     % 对每一个聚类簇生成单类分类模型
         subW = cell(1,k);
