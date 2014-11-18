@@ -45,6 +45,11 @@ elseif mapping_task(argin,'training')
                 num_clust = length(unique(Idx))-1; % -1 是outlier
         end
         
+        if 1 == length(unique(Idx))
+            disp 'k= 1'
+            continue;
+        end
+        
         [dbcv(i),trees{i},adjM{i}] = MLAT_DBCV(A_target,Idx);  
         fprintf('k=%d时，DBCV评价：%.2f\n',i,dbcv(i));
         if dbcv(i) > dbcv_best
@@ -58,8 +63,7 @@ elseif mapping_task(argin,'training')
     % 对每一个聚类簇的MST直接构建MST单类分类模型
     subW = cell(1,best_k);
     for i = 1:1:best_k
-        A_target_thisClust = seldat(A_target,[],[],find(Idx==i));
-        subW{i}= RSCH_OCL_ESM_ClustDBCVMST_subMST(A_target_thisClust,frej,trees{best_i}{i},adjM{best_i}{i});
+        subW{i}= RSCH_OCL_ESM_ClustDBCVMST_subMST(A_target,frej,trees{best_i}{i},adjM{best_i}{i});
     end
     
     % 构建trained的prmapping

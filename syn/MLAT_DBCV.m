@@ -14,9 +14,13 @@ function out = MLAT_DBCV(a,index)
   for i = 1:1:length(lab)
       o = 1;
       n(i) = length(cluster{i});
+      %得到距离矩阵
       dist{i} =  squareform( pdist(data{i}, 'euclidean'));  
       for j = 1:n(i)  
-       apts{i}(o) =  ((sum((1./dist{i}(j,1:j-1)) .^ d) + sum((1./dist{i}(j,j+1:n(i))) .^ d)) / (n(i) - 1)) ^(-1/d) ;
+      %分子，求除点j外，点j到其他所有点距离倒数d次幂,最后求和。
+      numerator = sum((1./dist{i}(j,1:j-1)) .^ d) + sum((1./dist{i}(j,j+1:n(i))).^ d);
+      %分子除ni-1后的-1/d次幂。
+       apts{i}(o) =  (numerator/ (n(i) - 1)) ^(-1/d) ;
        o = o + 1;
       end
   end

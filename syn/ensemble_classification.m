@@ -41,11 +41,14 @@ elseif mapping_task(argin,'execution')
     [a,v] = deal(argin{1:2}); 
 	mapping = getdata(v);
     w = mapping.w;
-    for i = 1:1:length(w)
-       W{i} = w{i} * dd_normc ;
-    end
+%     for i = 1:1:length(w)
+%        W{i} = w{i} * dd_normc ;
+%     end
     ensemble = mapping.ensemble;
-    W_out = [W{:}] * ensemble;
+    weight = [0.2,0.2,0.6];
+    f = 0.1;
+     W_out = feval(ensemble,[w{:}]);
+%      W_out =[w{:}] * ensemble;
     out = a * W_out;
      
 end
