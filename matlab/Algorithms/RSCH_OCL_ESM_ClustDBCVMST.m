@@ -9,7 +9,7 @@
 %       -- kcenters
 %       -- fcm
 %       -- dbscan
-
+%alf:测试参数选择
 
 function out = RSCH_OCL_ESM_ClustDBCVMST(varargin)
 argin = setdefaults(varargin,[],3,'kcentres',0.1);
@@ -64,9 +64,11 @@ elseif mapping_task(argin,'execution')
     for i = 1 : 1 : mapping.k
 %             mst_path = mapping.mst.path{i};
 %             thr(i) = max(max(mst_path)) * (1 - 0.1);
-%         mst_path = mapping.mst.tree{i}(:,3);
-%         thr(i) = max(mst_path) * (1 - 0.1);
-        thr(i) = mapping.mst.compcl(i) * (1 - mapping.alf);
+%最长边thr
+        mst_path = mapping.mst.tree{i}(:,3);
+        thr(i) = max(mst_path) * (1 - 0.1);
+%去掉1°点后thr
+%        thr(i) = mapping.mst.compcl(i) * (1 - mapping.alf);
     end
 
     % 按照阈值判定测试点的归属
