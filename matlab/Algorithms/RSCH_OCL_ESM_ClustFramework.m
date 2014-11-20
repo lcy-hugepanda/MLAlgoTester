@@ -37,8 +37,6 @@ elseif mapping_task(argin,'training')
          % 直接使用参数k
     elseif strcmp(numClust, 'entropy')
         [k,Idx] = selectKbyEntropy(a, disM, 'kcentres',k);
-    elseif strcmp(numClust,'DBCV')
-        [centers, Idx,k,tree,path,fdata,apts,dmreach] = selectKbyDBCV(a, disM, 'kcentres',k);
     end
     
     % 调用聚类算法,聚类个数输入是k，其他参数全部设置默认值或替换到位
@@ -66,16 +64,6 @@ elseif mapping_task(argin,'training')
                 k = max(unique(Idx));
         end
     end
-    
-    if strcmp(OCCAlgo, 'mst')
-        mstdata.center = centers;
-        mstdata.tree = tree;
-        mstdata.path = path;
-        mstdata.fdata = fdata; 
-        mstdata.apts = apts;
-        mstdata.dmreach = dmreach; 
-        mstdata.Idx = Idx;
-    else
     % 对每一个聚类簇生成单类分类模型
         subW = cell(1,k);
         for i = 1:1:k
@@ -84,14 +72,11 @@ elseif mapping_task(argin,'training')
             subW{i}= eval(OCCAlgo);
         end
         data.subW = subW;
-    end
     
     % 构建trained的prmapping
-    data.Idx = Idx;
-    
+    data.Idx = Idx;   
     data.k = k;
-    data.OCCAlgo = OCCAlgo;
-    data.mst = mstdata;
+    data.OCCAlgo = OCCAlgo;  
     data.combineRule = combineRule;
     out = trained_classifier(a_origin, data);
     
@@ -100,43 +85,10 @@ elseif mapping_task(argin,'execution')
     [a,v] = deal(argin{1:2}); 
     a = prdataset(a);
 	mapping = getdata(v);
-    
-    if strcmp(mapping.OCCAlgo,'mst')
-        dist =  pdist2(a.data,mapping.mst.center,'Euclidean');
-        [mmin,Idx] = min(dist,[],2);
-        for i = 1:a.objsize
-            dist = [];
-            dist = pdist2(mapping.mst.fdata{Idx(i)},a.data(i,:),'Euclidean');
-            numerator = sum((1./dist(find(dist ~= 0))) .^ a.featsize);
-            %分子除ni-1后的-1/d次幂。
-            apts(i) = (numerator/length(mapping.mst.fdata{Idx(i)})) ^(-1/a.featsize);
-            %apts为测试集中每个点的apt值。mapping.mst.apts为训练集中点的apt值。
-            for j = 1:length(mapping.mst.fdata{Idx(i)})
-                d_reach{i}(j) = max([apts(i) mapping.mst.apts{Idx(i)}(j) dist(j)]);
-            end
-        end
-        %d_reach为测试集中点到该聚类簇点的可达距离。
-        
-        % 设定每一个聚类簇的判定阈值
-        thr = zeros(1,mapping.k);
-        for i = 1 : 1 : mapping.k
-            mst_path = mapping.mst.path{i};
-            thr(i) = max(max(mst_path)) * (1 - 0.1);
-        end
-        
-        % 按照阈值判定测试点的归属
-        result = zeros(a.objsize, 2);
-        for i = 1 : 1 : a.objsize
-            result(i,1) = min(d_reach{i}) - thr(Idx(i));
-        end
-        
-        out = setdat(a,result,v);
-    else
-        w = mapping.subW;
-        combineRule = mapping.combineRule;
-        W_out = [w{:}] * combineRule;
-        out = a * W_out;
-    end
+    w = mapping.subW;
+    combineRule = mapping.combineRule;
+    W_out = [w{:}] * combineRule;
+    out = a * W_out;
      
 end
 end
