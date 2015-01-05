@@ -5,7 +5,7 @@ clear all
 close all
 % 各个子内容之间互相独立，请使用cell导航
 % 此外，为了方便调试，每一个cell在这里选择
-func = 2;
+func = 1;
 % func 1 : 使用一个csv表格进行ranking盒图绘制
 % func 2 : 使用多个csv表格可视化某一个参数对多个算法的影响
 
@@ -17,13 +17,13 @@ if 1 == func
 %  Data2, 0.8, 0.7
 % 由于MATLAB的boxplot与PRTools冲突，请先clear classes
 clear classes
-src_path = '..\\results\\E09_AUC_compare_v2.csv';
+src_path = '..\\results\\benchmark\\temp_generated_table_pure_value.csv';
 fin=fopen(src_path,'r');
 algo_name = fgetl(fin);
 fclose(fin);
 algo_name = regexp(algo_name, ',', 'split');
-algo_name = algo_name(1,2:length(algo_name));
-data = csvread(src_path,1,1);
+algo_name = algo_name(1,1:length(algo_name)); % 这里可能需要修正以适合具体的表头
+data = csvread(src_path,1,0);  % 第三个参数是0时，原表没有列表头，否则设置为1
 [num_dataset, num_algo] = size(data);
 rank_matrix = zeros(num_dataset, num_algo);
 for d = 1 : 1 : num_dataset
@@ -61,11 +61,11 @@ xtextp=xt;
 ytextp=(yt(1)-0.2*(yt(2)-yt(1))-0.01)*ones(1,length(xt)); 
 % rotation，正的旋转角度代表逆时针旋转，旋转轴可以由HorizontalAlignment属性来设定，
 % 有3个属性值：left，right，center
-text(xtextp,ytextp,xtl,'HorizontalAlignment','right','rotation',30,'fontname','TimesNewRoman','fontsize',12); 
+text(xtextp,ytextp,xtl,'HorizontalAlignment','right','rotation',30,'fontname','Times New Roman','fontsize',12); 
 % 取消原始ticklabel
 set(gca,'xticklabel','');
-ylabel('Ranks of algorithms','fontname','TimesNewRoman','fontsize',12);
-
+ylabel('Ranks of algorithms','fontname','Times New Roman','fontsize',12);
+set(gca,'XTick',[]);
 
 elseif 2 == func
 %% 使用多个csv表格（每一个算法对应一个）可视化表示某一个参数对算法性能的影响（每一个数据集一个子图）

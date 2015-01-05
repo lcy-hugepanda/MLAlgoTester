@@ -1,4 +1,4 @@
-% 一种实验方法
+% 一种实验方法 E-10
 % 首先通过类似于DBCV的方式进行密度分析并得到各个聚类簇的最小生成树
 % 之后对每一个MST进行分解并使用gauss_dd描述
 % 最后使用mergec合并
@@ -7,19 +7,20 @@
 %   nameClustAlgo: 聚类算法名
 %   k: 聚类算法的参数
 %   frej: 拒绝率
-function out = RSCH_OCL_SIGL_DBMST(varargin)
-argin = setdefaults(varargin,[],0.1);
+function out = RSCH_OCL_SIGL_DBMEOC(varargin)
+argin = setdefaults(varargin,[],0.1,0.01,false,0.1);
 
 if mapping_task(argin,'definition')
-	out = define_mapping(argin,'untrained',['RSCH_DBCVMST' int2str(argin{2})]);
+	out = define_mapping(argin,'untrained',['RSCH_E10_DBM-EOC' int2str(argin{2})]);
 elseif mapping_task(argin,'training')
-    [A ,frej] = deal(argin{:});
+    [A ,frej,delete_thr,is_merge_core, para_gauss] = deal(argin{:});
     % 这里有一些微调选项
     knn_para = 1; % 越大的话，参与KNN的点越少，取1的时候和所有点取KNN
     is_delete_edge = true; % 是否根据DCT树的长度分布删除过于长的边
-    delete_para = 5; % 越大的话删除的边越少，默认取5
-    is_merge_core = true; % 是否将过于小的core集合并到大的core集中
-    para_gauss = 0.1;
+%     delete_para = 5; % 越大的话删除的边越少，默认取5
+%     delete_thr = 0.015; % Z检验删除长边的置信区间
+%     is_merge_core = false; % 是否将过于小的core集合并到大的core集中
+%     para_gauss = 0.1;
     
     % 单独提取正类样本用于训练
     A_target = target_class(A);
@@ -37,16 +38,19 @@ elseif mapping_task(argin,'training')
         %分子，求除点j外，点j到其他所有点距离倒数d次幂,最后求和
         this_point_dist = sort(distM(j,:));
         knn_point_dist = this_point_dist(2:fix(length(this_point_dist)/knn_para));
-        numerator = sum((1./knn_point_dist).^ d);
+        numerator = sum((1./knn_point_dist).^ 2);
         %分子除ni-1后的-1/d次幂。
-        apts(o) =  (numerator/ (num_target - 1)) ^(-1/d) ;
+        apts(o) =  (numerator/ (num_target - 1)) ^(-1/ 2) ;
         o = o + 1;
     end
      
     %计算可达距离
     for i = 1:1:num_target
         for j = 1:1:num_target
-            d_mreach(i,j) = max([apts(i) apts(j) distM(i,j)]);              
+            d_mreach(i,j) = max([ min([apts(i) apts(j)]) distM(i,j)]); 
+%             d_mreach(i,j) = max([apts(i) apts(j) distM(i,j)]);
+%             d_mreach(i,j) = max([apts(i) apts(j)]);
+%             d_mreach(i,j) = distM(i,j);
         end
     end
     %conducting an MST
@@ -57,28 +61,40 @@ elseif mapping_task(argin,'training')
     % 因此这里的处理需要更谨慎一些，考虑参照MST_CD的方式
     pruned_adjM = adjM;
     length_edge = pruned_adjM(find(pruned_adjM>0));
-    length_edge = sort(length_edge);
-    k1 = 1;
-    k2 = 1;
-    inlier = [];
+    
+    % Z-test的pruning逻辑
     outlier = [];
-    len = length(length_edge);
-    average1 = mean(length_edge);
-    standard1 = std(length_edge);
-    for i = 1:len
-        if abs( length_edge(i) - average1) < k1 * standard1
-            inlier = [inlier length_edge(i)];
-        end
-    end
-    average2 = mean(inlier);
-    standard2 = std(inlier);
-    for i = 1:len
-        if length_edge(i) - average2 >= k2 * standard2 * delete_para %这里不取绝对值，因为我们只关心太长的边
+    for i = 1 : 1 : length(length_edge)
+        z = ztest(length_edge(i),mean(length_edge),std(length_edge),delete_thr);
+        if 1 == z
             outlier = [outlier length_edge(i)];
         end
     end
-    num_delete = length(outlier)*2; % 因为下面是从邻接矩阵删除，一条边会有两个值
-    fprintf('%d egdes deleted . \n',num_delete/2);
+
+%     这里注释掉的是一种简单粗暴的pruning，这部分只需要得出一个数量即可
+%     length_edge = sort(length_edge);
+%     k1 = 1;
+%     k2 = 1;
+%     inlier = [];
+%     outlier = [];
+%     len = length(length_edge);
+%     average1 = mean(length_edge);
+%     standard1 = std(length_edge);
+%     for i = 1:len
+%         if abs( length_edge(i) - average1) < k1 * standard1
+%             inlier = [inlier length_edge(i)];
+%         end
+%     end
+%     average2 = mean(inlier);
+%     standard2 = std(inlier);
+%     for i = 1:len
+%         if length_edge(i) - average2 >= k2 * standard2 * delete_para %这里不取绝对值，因为我们只关心太长的边
+%             outlier = [outlier length_edge(i)];
+%         end
+%     end
+    
+    num_delete = length(outlier);
+    fprintf('%d egdes deleted . \n',num_delete);
     
     % 这是之前的逻辑，按照从大到小的顺序删除若干条边，数量决定于frej
     %num_delete = fix(num_target * frej * 2);
@@ -86,12 +102,28 @@ elseif mapping_task(argin,'training')
         num_delete = 0;
     end
     pruned_adjM = adjM;
+    pruned_trees = trees;
+    deleted_edges = [];
     while num_delete > 0
         [temp, del_x] = max(pruned_adjM);
         [temp, del_y] = max(temp);
         pruned_adjM(del_x(del_y),del_y) = 0;
-        %fprintf('prun: %d %d\n',del_x(del_y),del_y);
+        
+         fprintf('prun: %d %d\n',del_x(del_y),del_y);
+        % 这部分用于MNIST找出outlier图片
+%         fprintf('prun: %f %f\n',dataM(del_x(del_y),1),dataM(del_x(del_y),2));
+%         fprintf('prun: %f %f\n',dataM(del_y,1),dataM(del_y,2));
+
         num_delete = num_delete - 1;
+        
+        
+        % 同时需要得出一个pruned之后的tree
+        for i = 1 : 1 : size(pruned_trees,1)
+            if pruned_trees(i,1) == del_x(del_y) && pruned_trees(i,2) == del_y
+                pruned_trees(i,:) = [0 0];
+                deleted_edges = [deleted_edges ;trees(i,:)];
+            end
+        end
     end
     
     % 从树中分析得到core point
@@ -163,8 +195,8 @@ elseif mapping_task(argin,'training')
         end
         if size(A_target_thisCore,1) > 1
             subW{w_idx}= gauss_dd(A_target_thisCore,frej,para_gauss);
-            % subW{w_idx}= parzen_dd(A_target_thisCore,frej);
-            % subW{w_idx}=OCLT_AlgoLibsvmOCSVM(A_target_thisCore, 'default', frej, A_target_thisCore);
+%             subW{w_idx}= parzen_dd(A_target_thisCore,frej);
+%             subW{w_idx}=OCLT_AlgoLibsvmOCSVM(A_target_thisCore, 'default', frej, A_target_thisCore);
             % subW{w_idx}=incsvdd(A_target_thisCore, frej,1.0/d);
             w_idx = w_idx +1 ;
         end
@@ -175,6 +207,8 @@ elseif mapping_task(argin,'training')
     data.subW = subW;
     data.k = length(subW);
     data.mst = trees;
+    data.mst_pruned = pruned_trees;
+    data.deleted_edges = deleted_edges;
     data.adjM = pruned_adjM;
     data.core_set = core_set;
     out = trained_classifier(A_target, data);

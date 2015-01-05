@@ -94,8 +94,8 @@ RSCH_OCL_ESM_OCCBoost(A,%FRACREJ%,%IterationTime%,%OutlierPrecision%)
 Meta_ClustEOCC(%ClusterNum%,%ClusterArgument%,%ClusterName%,%OCC_Name%,%CombineRule%)
 RSCH_OCL_ESM_ClustFramework(A,%ClusterNum%,%ClusterArgument%,%ClusterName%,%OCC_Name%,%CombineRule%)
 
-E12_DBCV_MST(%ClusterName%,%ClusterNum%,%FRACREJ%)
-RSCH_OCL_ESM_ClustDBCVMST(A,%ClusterName%,%ClusterNum%,%FRACREJ%)
+E12_DBCV_MST(%ClusterNum%,%FRACREJ%)
+RSCH_OCL_ESM_ClustDBCVMST(A,%ClusterNum%,%FRACREJ%)
 
-DDC_EOC_GAUSS(%FRACREJ%)
-RSCH_OCL_SIGL_DBMST(A,0.1)
+E10_DBM_EOC_GAUSS(%FRACREJ%,%Confidance%,%IsExtend%,%ParaGauss%)
+RSCH_OCL_SIGL_DBMEOC(A,%FRACREJ%,%Confidance%,%IsExtend%,%ParaGauss%)

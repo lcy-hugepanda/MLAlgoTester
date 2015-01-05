@@ -57,7 +57,7 @@ crit_idx = 1;
 % 表格类
 % 201:单一指标对比表格，固定某一个评价指标，给出各数据集上的对比表
 elseif 201 == show_type
-crit_idx = 4;
+crit_idx = 2 ;
 
 %
 %===========================================================================
@@ -67,7 +67,7 @@ elseif 301 == show_type
     algo_idx = 1;
 % 302:固定一个数据集，绘制各个算法在其上的决策面
 elseif 302  == show_type
-    dataset_idx = 4;
+    dataset_idx = 1;
 % 303:固定数据集，显示各种人工负类生成方法（请注意，与测试过程无关）
 elseif 303  == show_type
     dataset_idx = 3;

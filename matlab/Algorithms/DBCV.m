@@ -1,4 +1,8 @@
-function [valid,Edges,d_ucore_cl,mr,fdata,objcl,compcl] = DBCV(data,partition)
+% 增加了一个mode参数
+%   'normal' 一般情况计算
+%   'single' 只有一个聚类簇的时候的计算，不输出最终DBCV，只要中间结果
+function [valid,Edges,d_ucore_cl,mr,fdata,objcl,compcl,point_degree] = ...
+    DBCV(data,partition,mode)
 %version using kernel. still one intra and inter cluster value, but we got
 %rid of parameter k, for the number of neighbors during core calculation.
 
@@ -24,10 +28,11 @@ end
 
 clusters  = setdiff(clusters,0);
 
-if (isempty(clusters) || (length(clusters) == 1))
-    valid = 0;
-    return;
-end
+% 为了'single'选项，这里先注释掉
+% if (isempty(clusters) || (length(clusters) == 1))
+%     valid = 0;
+%     return;
+% end
 
 data      = data(partition~=0,:);
 
@@ -46,6 +51,7 @@ d_ucore_cl       = zeros(1,nobjects);
 compcl           = zeros(1,nclusters);
 int_edges        = cell(1,nclusters);
 int_node_data   = cell(1,nclusters);
+point_degree = cell(1,nclusters);
 for i=1:nclusters
     
     objcl{i}   = find(partition == clusters(i));
@@ -60,6 +66,7 @@ for i=1:nclusters
     G.MST_parent  = zeros(nuobjcl,1);
     
     [Edges{i} Degrees] = MST_Edges(G, 1,mr{i});
+    point_degree{i} = Degrees;
     
     int_node     = find(Degrees~=1);
     int_edg1     = find(ismember(Edges{i}(:,1),int_node));    
@@ -84,6 +91,12 @@ for i=1:(nobjects-1)
         sep_point(i,j) = max([dist(i,j) d_ucore_cl(i) d_ucore_cl(j)]);        
         sep_point(j,i) = sep_point(i,j);
     end
+end
+
+% 如果用'single'则不计算DBCV
+if strcmp(mode, 'single')
+    valid = 0;
+    return;
 end
 
 valid = 0;

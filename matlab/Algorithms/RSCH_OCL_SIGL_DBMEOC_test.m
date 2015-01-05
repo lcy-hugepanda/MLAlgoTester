@@ -1,11 +1,14 @@
 gridsize 120
 
-a = MLAT_GenAritificialData(8);
+a = MLAT_GenAritificialData(14);
 %a = trainingA{1,1}{1}
-%sw= RSCH_OCL_SIGL_DBMST(a,0.05);
+load('E:\\ResearchCodes\\Data_BenchmarkForOCC\\MNIST\\MNIST_train_gist_10Classes.mat')
+a = oc_set(x,1);
+
+w= RSCH_OCL_SIGL_DBMEOC(a,0.05);
 %w = OCLT_AlgoLibsvmOCSVM(target_class(a),'default',0.05,a);
-w = mog_dd(a,0.05);
-w = knndd(a,0.05);
+% w = mog_dd(a,0.05);
+%w = knndd(a,0.05);
 
 scatterd(a);
 res = a*w;

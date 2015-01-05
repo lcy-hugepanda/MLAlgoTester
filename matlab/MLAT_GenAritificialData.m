@@ -16,6 +16,18 @@ function A  = MLAT_GenAritificialData(idx)
         A = DataArtificialGenForOCC('multi gauss for cluster stability analysis',[100,100]);
     elseif 8 == idx % 多密度分布，使用两个散布程度不一样的高斯分布说明情况
         A = DataArtificialGenForOCC('four bananas for multi density',[100,100]);
+    elseif 9 == idx % 最简单的二分类，就是两个高斯
+        A = DataArtificialGenForOCC('twin gauss',[100,100]);
+    elseif 10 == idx % 二分类，有一边是多个高斯分布
+        A = DataArtificialGenForOCC('multi-modality binary classification',[100,100]);
+    elseif 11 == idx % OCC,四个gauss的多模态分布（四高斯数据集）
+        A = DataArtificialGenForOCC('four gauss',[100,100]);
+    elseif 12 == idx % OCC,三个不同密度gauss的多密度分布(葫芦数据集)
+        A = DataArtificialGenForOCC('calabash',[100,100]);
+    elseif 13 == idx % OCC,示意正类存在噪声的数据集（光环数据集）
+        A = DataArtificialGenForOCC('halo',[100,100]);
+    elseif 14 == idx % OCC,较为简单的两个聚类簇的香蕉型数据（烂香蕉数据集）
+        A = DataArtificialGenForOCC('BrokenBanana',[100,100]);
     end
 end
 
@@ -219,10 +231,53 @@ switch type
         A = gendatoc(A_target, A_outlier);
     case 'twin gauss'
         %% 生成2个高斯分布的Target
-        part1 = oc_set(gauss([150 100],[-1 -1; 0.5 -1]),'1');
-        part2 = oc_set(gauss([150 100],[2.5 3; 1.2 2.3]),'1');
+        part1 = oc_set(gauss([150 0],[-1 -1; 0.5 -1]),'1');
+        part2 = oc_set(gauss([150 0],[2 2; 0.5 -1]),'1');
         A = gendatoc(part1, part2);
         %A = LC_CombineDatasets(part1, part2, 1);
+    case 'multi-modality binary classification'
+        part1_1 = oc_set(gauss([100 0],[-3.5 -3.5; 0.5 -1]),'1');
+        part1_2 = oc_set(gauss([100 0],[-3.5 3.5; 0.5 -1]),'1');
+        part1_3 = oc_set(gauss([100 0],[3.5 -3.5; 0.5 -1]),'1');
+        tempA =  OCLT_DataCombineDatasets(part1_1, part1_2);
+        tempA =  OCLT_DataCombineDatasets(tempA, part1_3);
+        part2 = oc_set(gauss([100 1],[2 2; 1.2 2.3]),'1');
+        A = gendatoc(tempA, part2);
+    case 'four gauss'
+        part1_1 = oc_set(gauss([100 0],[-4 -4; 0.5 -1]),'1');
+        part1_2 = oc_set(gauss([100 0],[-4 4; 0.5 -1]),'1');
+        part1_3 = oc_set(gauss([100 0],[4 -4; 0.5 -1]),'1');   
+        part1_4 = oc_set(gauss([100 0],[4 4; 0.5 -1]),'1');   
+        tempA =  OCLT_DataCombineDatasets(part1_1, part1_2);
+        tempA =  OCLT_DataCombineDatasets(tempA, part1_3);
+        tempA =  OCLT_DataCombineDatasets(tempA, part1_4); 
+        part2 = unifrnd(-6,6,200,2);
+        A = gendatoc(tempA, part2);
+	case 'calabash'
+        part1_1 = oc_set(gauss([200 0],[-4 -4; 0.5 -1],cat(3,[6 0; 0 6],eye(2))),'1');
+        part1_2 = oc_set(gauss([200 0],[1 1; 0.5 -1]),'1');   
+        part1_3 = oc_set(gauss([200 0],[3 3; 0.5 -1],cat(3,[0.1 0;0 0.1],eye(2))),'1');   
+        tempA =  OCLT_DataCombineDatasets(part1_1, part1_2);
+        tempA =  OCLT_DataCombineDatasets(tempA, part1_3);
+        part2 = unifrnd(-10,6,200,2);
+        A = gendatoc(tempA, part2);
+    case 'halo'
+        part1 = oc_set(gauss([200 0],[0 0; 0.5 -1]),'1');   
+        part2 = unifrnd(-6,6,100,2);
+        A = gendatoc([+part1;5 0;0 5;-5 0;0 -5;3.5 3.5;-3.5 3.5;3.5 -3.5;-3.5 -3.5;...
+            4.5 2;4.5 -2;-4.5 2;-4.5 -2;2 4.5;2 -4.5;-2 4.5;-2 -4.5], part2);
+    case 'BrokenBanana'
+        temp1 = gendatb([300 0]);
+        temp1 = +temp1;
+        delete_idx = [];
+        for i = 1 : 1 : size(temp1,1)
+            if temp1(i,2) < 1 && temp1(i,2) > -2
+                delete_idx = [delete_idx i];
+            end
+        end
+        temp1(delete_idx,:) = [];
+        temp2 = unifrnd(-8,8,100,2);
+        A = gendatoc(temp1, temp2);
 end
 
 end
