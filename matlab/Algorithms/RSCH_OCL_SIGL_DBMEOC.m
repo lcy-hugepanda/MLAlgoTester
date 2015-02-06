@@ -40,7 +40,7 @@ elseif mapping_task(argin,'training')
         knn_point_dist = this_point_dist(2:fix(length(this_point_dist)/knn_para));
         numerator = sum((1./knn_point_dist).^ 2);
         %分子除ni-1后的-1/d次幂。
-        apts(o) =  (numerator/ (num_target - 1)) ^(-1/ 2) ;
+        apts(o) =  (numerator/ (num_target - 1)) ^ (-1/2) ;
         o = o + 1;
     end
      
@@ -104,6 +104,7 @@ elseif mapping_task(argin,'training')
     pruned_adjM = adjM;
     pruned_trees = trees;
     deleted_edges = [];
+    pruned_outlier = []; % 被purned而且degree是1的点的标号（正类内的标号）
     while num_delete > 0
         [temp, del_x] = max(pruned_adjM);
         [temp, del_y] = max(temp);
@@ -111,8 +112,12 @@ elseif mapping_task(argin,'training')
         
          fprintf('prun: %d %d\n',del_x(del_y),del_y);
         % 这部分用于MNIST找出outlier图片
-%         fprintf('prun: %f %f\n',dataM(del_x(del_y),1),dataM(del_x(del_y),2));
-%         fprintf('prun: %f %f\n',dataM(del_y,1),dataM(del_y,2));
+        if length(find(adjM(del_x(del_y),:))) == 1
+            pruned_outlier = [pruned_outlier del_x(del_y)];
+        end
+        if length(find(adjM(del_y,:))) == 1
+            pruned_outlier = [pruned_outlier del_y];
+        end        
 
         num_delete = num_delete - 1;
         
@@ -202,6 +207,10 @@ elseif mapping_task(argin,'training')
         end
     end
     
+    % 用于实验，找到最大的几个LDS中心点
+    [~, LDS] = sort(point_weight,'descend');
+    LDS = LDS(1:5);
+    
     % 构建trained的prmapping
     data.Idx_core = idx_core;
     data.subW = subW;
@@ -211,6 +220,8 @@ elseif mapping_task(argin,'training')
     data.deleted_edges = deleted_edges;
     data.adjM = pruned_adjM;
     data.core_set = core_set;
+    data.pruned_outlier = pruned_outlier;
+    data.LDS = LDS;
     out = trained_classifier(A_target, data);
     
 % 测试部分

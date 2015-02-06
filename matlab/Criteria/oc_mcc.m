@@ -1,6 +1,7 @@
 function mcc = oc_mcc(A,W)
     [fn, fp, tn, tp] = dd_error_modify(A,W);
-    mcc = (tp * tn - fp * fn)/sqrt((tp+fp)*(tp+fn)*(tn+fp)*(tn+fn))
+    mcc = (tp * tn - fp * fn)/sqrt((tp+fp)*(tp+fn)*(tn+fp)*(tn+fn));
+    fprintf('MCC: %.4f  (TP: %d  TN: %d  FP: %d  FN:  %d)\n',mcc,tp,tn,fp,fn);
 end
 
 % 实际使用的是dd_tools里面的dd_error函数

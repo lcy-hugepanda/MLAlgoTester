@@ -28,25 +28,31 @@ elseif mapping_task(argin,'training')
     clust = linkage(disM,'ward');  
     
     % 确定聚类个数
-    [core_point, core_point_idx,Idx,k,tree,apts,dmreach,fdata,fclusterIdx,fcompcl] = ...
+    [core_point, core_point_idx,Idx,k,tree,apts,dmreach,fdata,fclusterIdx,fcompcl,fpoint_degree] = ...
         E12_DBCV(a, clust,k);
     
     fprintf('k = %d\n',k);
     
+    w = cell(1,k); % 基分类器
+    for i = 1 : 1 : k
+        w{i} = RSCH_OCL_SIGL_DCTDD(fdata{i},0.1,tree{i},apts(fclusterIdx{i}),fcompcl(i),fpoint_degree{i});
+    end
+    
     mstdata.core_point = core_point;
     mstdata.core_point_idx = core_point_idx;
-    mstdata.tree = tree;
-    mstdata.apts = apts;
-    mstdata.fdata = fdata;
-    mstdata.dmreach = dmreach; 
+%     mstdata.tree = tree;
+%     mstdata.apts = apts;
+%     mstdata.fdata = fdata;
+%     mstdata.dmreach = dmreach; 
     mstdata.Idx = Idx;
-    mstdata.clusterIdx = fclusterIdx;
-    mstdata.compcl = fcompcl;
+%     mstdata.clusterIdx = fclusterIdx;
+%     mstdata.compcl = fcompcl;
     % 构建trained的prmapping
     data.Idx = Idx;
     data.k = k;
     data.mst = mstdata;
     data.alf = alf;
+    data.subW = w;
     out = trained_classifier(a_origin, data);    
 % 测试部分
 elseif mapping_task(argin,'execution')
@@ -63,67 +69,73 @@ elseif mapping_task(argin,'execution')
     [~,min_idx] = min(dist,[],2);
     Idx = mapping.mst.core_point_idx(min_idx); % Idx表示测试集中各个点所属的聚类簇
     
-    d_reach = cell(a.objsize);
-    for i = 1:a.objsize
-%         dist = pdist2(a.data(mapping.mst.clusterIdx{Idx(i)},:),a.data(i,:),'Euclidean');
-%         numerator = sum((1./dist(find(dist>0))) .^ a.featsize);
-%         %分子除ni-1后的-1/d次幂。
-%         apts(i) = (numerator/length(mapping.mst.clusterIdx{Idx(i)})) ^(-1/a.featsize);
+    result = [];
+    for i = 1 : 1 : a.objsize
+        result = [result ; a(i,:) * mapping.subW{Idx(i)}];
+    end
+    
+    i = i;
+%     d_reach = cell(a.objsize);
+%     for i = 1:a.objsize
+% %         dist = pdist2(a.data(mapping.mst.clusterIdx{Idx(i)},:),a.data(i,:),'Euclidean');
+% %         numerator = sum((1./dist(find(dist>0))) .^ a.featsize);
+% %         %分子除ni-1后的-1/d次幂。
+% %         apts(i) = (numerator/length(mapping.mst.clusterIdx{Idx(i)})) ^(-1/a.featsize);
+% %         %apts为测试集中每个点的apt值。mapping.mst.apts为训练集中点的apt值。
+% %         for j = 1:1:length(mapping.mst.clusterIdx{Idx(i)})
+% % %             d_reach{i}(j) = min([apts(i) mapping.mst.apts(mapping.mst.clusterIdx{Idx(i)}(j)) dist(j)]);
+% %             d_reach{i}(j) = max([apts(i) min(dist)]);
+% %         end        
+%         
+%         % 仅使用各聚类簇的core点计算可达距离
+%         data_core = [mapping.mst.core_point(find(mapping.mst.core_point_idx == Idx(i)),:); a.data(i,:)];
+%         dist_core = pdist(data_core,'Euclidean');
+%         for i = 1 : 1 : size(data_core,1)
+%             numerator = sum((1./dist_core(find(dist_core > 0))) .^ a.featsize);
+%             %分子除ni-1后的-1/d次幂。
+%             apts(i) = (numerator/length(find(mapping.mst.core_point_idx == Idx(i)))) ^(-1/a.featsize);
+%         end
+% 
 %         %apts为测试集中每个点的apt值。mapping.mst.apts为训练集中点的apt值。
-%         for j = 1:1:length(mapping.mst.clusterIdx{Idx(i)})
-% %             d_reach{i}(j) = min([apts(i) mapping.mst.apts(mapping.mst.clusterIdx{Idx(i)}(j)) dist(j)]);
-%             d_reach{i}(j) = max([apts(i) min(dist)]);
-%         end        
-        
-        % 仅使用各聚类簇的core点计算可达距离
-        data_core = [mapping.mst.core_point(find(mapping.mst.core_point_idx == Idx(i)),:); a.data(i,:)];
-        dist_core = pdist(data_core,'Euclidean');
-        for i = 1 : 1 : size(data_core,1)
-            numerator = sum((1./dist_core(find(dist_core > 0))) .^ a.featsize);
-            %分子除ni-1后的-1/d次幂。
-            apts(i) = (numerator/length(find(mapping.mst.core_point_idx == Idx(i)))) ^(-1/a.featsize);
-        end
-
-        %apts为测试集中每个点的apt值。mapping.mst.apts为训练集中点的apt值。
-        for j = 1:1:length(find(mapping.mst.core_point_idx == Idx(i)))
-%             d_reach{i}(j) = max([apts(i) mapping.mst.apts(mapping.mst.clusterIdx{Idx(i)}(j)) dist(j)]);
-            d_reach{i}(j) = max([apts(i) min(mapping.mst.apts(find(mapping.mst.clusterIdx==i)))  min(dist_core(j))]);
-        end
-    end
-    %d_reach为测试集中点到该聚类簇点的可达距离。
-
-    % 设定每一个聚类簇的判定阈值
-    thr = zeros(1,mapping.k);
-    for i = 1 : 1 : mapping.k
-%             mst_path = mapping.mst.path{i};
-%             thr(i) = max(max(mst_path)) * (1 - 0.1);
-%按照阈值去除过长边的最长边thr
-        mst_path = sort(mapping.mst.tree{i}(:,3));
-        thr_2 = max(mst_path(1:fix(length(mst_path)*(1-mapping.alf))));
-%最长边thr
-        mst_path = mapping.mst.tree{i}(:,3);
-        thr_3 = max(mst_path);
-%平均边长thr
-        mst_path = mapping.mst.tree{i}(:,3);
-        thr_4 = mean(mst_path);
-%去掉1°点后thr
-        thr_5 = mapping.mst.compcl(i) * (1 - mapping.alf);
-
-        thr(i) = thr_3;
-    end
-
-    % 按照阈值判定测试点的归属
-    result = zeros(a.objsize, 2);
-    for i = 1 : 1 : a.objsize % 对于每一个样本
-        result(i,1) = min(d_reach{i}) - thr(Idx(i));
-    end
+%         for j = 1:1:length(find(mapping.mst.core_point_idx == Idx(i)))
+% %             d_reach{i}(j) = max([apts(i) mapping.mst.apts(mapping.mst.clusterIdx{Idx(i)}(j)) dist(j)]);
+%             d_reach{i}(j) = max([apts(i) min(mapping.mst.apts(find(mapping.mst.clusterIdx==i)))  min(dist_core(j))]);
+%         end
+%     end
+%     %d_reach为测试集中点到该聚类簇点的可达距离。
+% 
+%     % 设定每一个聚类簇的判定阈值
+%     thr = zeros(1,mapping.k);
+%     for i = 1 : 1 : mapping.k
+% %             mst_path = mapping.mst.path{i};
+% %             thr(i) = max(max(mst_path)) * (1 - 0.1);
+% %按照阈值去除过长边的最长边thr
+%         mst_path = sort(mapping.mst.tree{i}(:,3));
+%         thr_2 = max(mst_path(1:fix(length(mst_path)*(1-mapping.alf))));
+% %最长边thr
+%         mst_path = mapping.mst.tree{i}(:,3);
+%         thr_3 = max(mst_path);
+% %平均边长thr
+%         mst_path = mapping.mst.tree{i}(:,3);
+%         thr_4 = mean(mst_path);
+% %去掉1°点后thr
+%         thr_5 = mapping.mst.compcl(i) * (1 - mapping.alf);
+% 
+%         thr(i) = thr_3;
+%     end
+% 
+%     % 按照阈值判定测试点的归属
+%     result = zeros(a.objsize, 2);
+%     for i = 1 : 1 : a.objsize % 对于每一个样本
+%         result(i,1) = min(d_reach{i}) - thr(Idx(i));
+%     end
 
     out = setdat(a,result,v);     
 end
 end
 
 
-function [core_point, core_point_idx, Index,k,tree,fapts,freach,fdata,fclusterIdx,fcompcl] = E12_DBCV(a, clust,k)
+function [core_point, core_point_idx, Index,k,tree,fapts,freach,fdata,fclusterIdx,fcompcl,fpoint_degree] = E12_DBCV(a, clust,k)
     is_found_k = 0;
     for i = 2:k 
         Idx{i} = cluster(clust,'maxclust',i);
@@ -132,7 +144,7 @@ function [core_point, core_point_idx, Index,k,tree,fapts,freach,fdata,fclusterId
     end
     if ~is_found_k
         [~,i] = max(dbcv(2:end));
-        best_k = i + 1;
+        best_k = i+1;
     end
     
     % 这里原来的逻辑是存储k-centers的聚类中心，但是这样就限制了聚类算法，不太合适
@@ -144,13 +156,35 @@ function [core_point, core_point_idx, Index,k,tree,fapts,freach,fdata,fclusterId
     core_point = []; % 每一行两个元素，第一个是聚类簇标号，第二个是聚类簇中该样本的标号
     core_point_idx = [];
     degree = point_degree{best_k};
-    for i = 1 : 1 : best_k % 对于每一个聚类簇
-        idx_this_clusterIdx = clusterIdx{best_k}{i}; % 该聚类簇中样本的标号  
-        for j = 1 : 1 : length(idx_this_clusterIdx)  % 对于聚类簇中每一个点
-            if degree{i}(j) > 2   % 与之相连的点超过3个，就是core点                     
-                core_point  = [core_point;data{best_k}{i}(j,:)];
-                core_point_idx = [core_point_idx; i];
-            end
+%     fprintf('SizeDegree: %d   SizeClust: %d\n',size(degree,2),size(data{best_k},2));
+    
+        % 这里存在一种情况，即在聚类簇中仅包含一个点的时候，不存在对应的degree，需要对此进行处理
+%         deleted_cluster = 0;
+%         for i = 1 : 1 : best_k
+%             if (1 >= size(data{best_k}{1,i- deleted_cluster},1))            
+%                 data{best_k}{1,i- deleted_cluster}= [];
+%                 deleted_cluster = deleted_cluster + 1;
+%             end
+%         end    
+%         best_k = best_k - deleted_cluster;
+    bias = 0;
+    for i = 1 : 1 : best_k - bias % 对于每一个聚类簇
+%         idx_this_clusterIdx = clusterIdx{best_k}{i}; % 该聚类簇中样本的标号  
+        temp = data{best_k};   
+        temp_clust_data = temp{1,i+bias};
+%         fprintf('SizeDegree{i}: %d   SizeClust{i}: %d\n',size(degree{i},1),size(temp_clust_data,1));
+        if (0 == size(temp_clust_data,1))
+            bias = bias+1;
+            temp_clust_data = temp{1,i+bias};
+        end
+%         for j = 1 : 1 : length(idx_this_clusterIdx)  % 对于聚类簇中每一个点
+        for j = 1 : 1 : size(temp_clust_data,1)  % 对于聚类簇中每一个点
+%             if exist('degree{i}(j,1)')
+                if degree{i}(j,1) > 2   % 与之相连的点超过3个，就是core点  
+                    core_point  = [core_point;temp_clust_data(j,:)];
+                    core_point_idx = [core_point_idx; i];
+                end
+%             end
         end
     end
         
@@ -162,4 +196,5 @@ function [core_point, core_point_idx, Index,k,tree,fapts,freach,fdata,fclusterId
     freach = dmreach{best_k};
     fclusterIdx = clusterIdx{best_k};
     fcompcl = compcl{best_k};
+    fpoint_degree = point_degree{best_k};
 end

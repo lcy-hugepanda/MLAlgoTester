@@ -10,13 +10,22 @@ function [valid,Edges,d_ucore_cl,mr,fdata,objcl,compcl,point_degree] = ...
 clusters  = unique(partition);
 dist             = squareform(pdist(data)).^2;
 
+% small_data_idx = [];
 for i = 1:1:length(clusters)
       fdata{i} = [];
       cluster{i} = find(partition == clusters(i));
       for j = 1 : 1 : length(cluster{i})
            fdata{i}(j,:) = data(cluster{i}(j),:);    
       end
+      
+%       if size(fdata{i},1) <= 1
+%           small_data_idx = [small_data_idx i];
+%       end
 end
+% if ~isempty(small_data_idx)
+%     fdata{small_data_idx} = [];
+% end
+
 %treating singleton clusters... since they are going to receive score 0, we
 %can say they are noise..
 for i=1:length(clusters)
@@ -85,6 +94,10 @@ for i=1:nclusters
     end
 end
 
+
+% fprintf('DBCV: Cluster: %d   Degrees: %d\n',nclusters, size(point_degree,2));
+
+
 sep_point = zeros(nobjects,nobjects);
 for i=1:(nobjects-1)
     for j=i:nobjects
@@ -114,5 +127,6 @@ for i=1:nclusters
 end
 
 valid = valid / length(poriginal); 
+
 
 end    
