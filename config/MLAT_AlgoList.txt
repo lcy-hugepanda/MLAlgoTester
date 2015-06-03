@@ -99,3 +99,6 @@ RSCH_OCL_ESM_ClustDBCVMST(A,%ClusterNum%,%FRACREJ%)
 
 E10_DBM_EOC_GAUSS(%FRACREJ%,%Confidance%,%IsExtend%,%ParaGauss%)
 RSCH_OCL_SIGL_DBMEOC(A,%FRACREJ%,%Confidance%,%IsExtend%,%ParaGauss%)
+
+E13_FMST(%SubAlgo%,%CombineRule%)
+RSCH_OCL_ESM_FMST_EOC(A,%SubAlgo%,%CombineRule%)

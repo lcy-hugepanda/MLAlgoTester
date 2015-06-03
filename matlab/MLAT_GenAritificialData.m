@@ -28,6 +28,10 @@ function A  = MLAT_GenAritificialData(idx)
         A = DataArtificialGenForOCC('halo',[100,100]);
     elseif 14 == idx % OCC,较为简单的两个聚类簇的香蕉型数据（烂香蕉数据集）
         A = DataArtificialGenForOCC('BrokenBanana',[100,100]);
+    elseif 15 == idx % 非常基本的问题形态，正类是一个香蕉 分布，负类在空间内均匀分布
+        A = DataArtificialGenForOCC('BasicBanana',[100,100]);
+    elseif 16 == idx % 非常基本的问题形态，正类是一个高斯分布，负类在空间内均匀分布
+        A = DataArtificialGenForOCC('BasicGauss',[100,100]);        
     end
 end
 
@@ -278,6 +282,16 @@ switch type
         temp1(delete_idx,:) = [];
         temp2 = unifrnd(-8,8,100,2);
         A = gendatoc(temp1, temp2);
+    case 'BasicBanana'
+        %part1 = oc_set(gauss([2000 0],[0 0; 0.5 -1],[2 1; 1 4]),'1');   
+        part1 = oc_set(gendatb([800 0]),'1');   
+        part2 = unifrnd(-6,6,50,2);
+        A = gendatoc(part1, part2);
+    case 'BasicGauss'
+        part1 = oc_set(gauss(1000, [0 0], 0.05 * eye(2)),'1') ;
+%         part1 = oc_set(gendatb([800 0]),'1');   
+        part2 = unifrnd(-1,1,50,2);
+        A = gendatoc(part1, part2);
 end
 
 end

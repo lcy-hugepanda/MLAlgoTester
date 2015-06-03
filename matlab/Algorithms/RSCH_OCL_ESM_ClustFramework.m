@@ -64,6 +64,16 @@ elseif mapping_task(argin,'training')
                 k = max(unique(Idx));
         end
     end
+    
+     k_valid = k;
+    for i = 1 : 1 : k-1
+        if length(find(Idx == i)) < 3
+            Idx(Idx == i) = [];
+            k_valid = k_valid - 1;
+        end
+    end   
+    k = k_valid;
+    
     % 对每一个聚类簇生成单类分类模型
         subW = cell(1,k);
         for i = 1:1:k
